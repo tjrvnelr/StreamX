@@ -17,11 +17,11 @@ describe('apiRequest', () => {
       headers: { 'content-type': 'text/html' },
     })))
 
-    await expect(apiRequest('/uploads', { method: 'POST', body: '{}' })).rejects.toMatchObject({
-      name: 'ApiError',
-      status: 404,
-      message: 'The API returned a web page instead of JSON. Set the frontend VITE_API_URL to your deployed API address ending in /api, confirm the API is running, then rebuild and redeploy the frontend.',
-    })
+    const error = await apiRequest('/uploads', { method: 'POST', body: '{}' }).catch((cause: unknown) => cause)
+    expect(error).toMatchObject({ name: 'ApiError', status: 404 })
+    expect(error).toBeInstanceOf(Error)
+    expect((error as Error).message).toContain('VITE_API_URL')
+    expect((error as Error).message).toContain('http://localhost/api/uploads')
   })
 
   it('normalizes API host values with or without the /api suffix', () => {

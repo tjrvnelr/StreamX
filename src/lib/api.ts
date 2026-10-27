@@ -7,7 +7,14 @@ export function normalizeApiBase(value?: string) {
 }
 
 const apiBase = normalizeApiBase(import.meta.env.VITE_API_URL)
-const unexpectedResponseMessage = 'The API returned a web page instead of JSON. Set the frontend VITE_API_URL to your deployed API address ending in /api, confirm the API is running, then rebuild and redeploy the frontend.'
+
+function unexpectedResponseMessage(response: Response, requestUrl: string) {
+  const target = response.url || requestUrl
+  const parsed = new URL(target, 'http://localhost')
+  const endpoint = parsed.origin + parsed.pathname
+  const contentType = response.headers.get('content-type')?.split(';')[0] || 'an unknown content type'
+  return `API request to ${endpoint} returned HTTP ${response.status} with ${contentType}. Set frontend VITE_API_URL to your deployed API base ending in /api, confirm that its /health route returns JSON, then rebuild and redeploy the frontend.`
+}
 
 export class ApiError extends Error {
   status: number
@@ -43,8 +50,9 @@ export async function apiRequest<T>(path: string, init: RequestInit = {}): Promi
   if (init.body && !(init.body instanceof FormData)) headers.set('Content-Type', 'application/json')
 
   let response: Response
+  const requestUrl = `${apiBase}${path}`
   try {
-    response = await fetch(`${apiBase}${path}`, { ...init, headers })
+    response = await fetch(requestUrl, { ...init, headers })
   } catch {
     throw new ApiError('Could not reach the StreamX API. Check VITE_API_URL, confirm the API service is running, and allow this site in the API FRONTEND_ORIGIN setting.', 0)
   }
@@ -53,10 +61,10 @@ export async function apiRequest<T>(path: string, init: RequestInit = {}): Promi
   if (!response.ok) {
     const message = payload.error || (isJson
       ? 'The request could not be completed.'
-      : unexpectedResponseMessage)
+      : unexpectedResponseMessage(response, requestUrl))
     throw new ApiError(message, response.status)
   }
-  if (!isJson) throw new ApiError(unexpectedResponseMessage, response.status)
+  if (!isJson) throw new ApiError(unexpectedResponseMessage(response, requestUrl), response.status)
   return payload
 }
 
