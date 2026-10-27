@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { apiRequest } from './api'
+import { apiRequest, normalizeApiBase } from './api'
 
 const auth = vi.hoisted(() => ({ getSession: vi.fn(), refreshSession: vi.fn() }))
 vi.mock('./supabase', () => ({ supabase: { auth } }))
@@ -20,8 +20,14 @@ describe('apiRequest', () => {
     await expect(apiRequest('/uploads', { method: 'POST', body: '{}' })).rejects.toMatchObject({
       name: 'ApiError',
       status: 404,
-      message: 'StreamX received an unexpected response. Check that the API URL is correct and the API service is running.',
+      message: 'The API returned a web page instead of JSON. Set the frontend VITE_API_URL to your deployed API address ending in /api, confirm the API is running, then rebuild and redeploy the frontend.',
     })
+  })
+
+  it('normalizes API host values with or without the /api suffix', () => {
+    expect(normalizeApiBase(undefined)).toBe('/api')
+    expect(normalizeApiBase('https://api.example.com')).toBe('https://api.example.com/api')
+    expect(normalizeApiBase('https://api.example.com/api/')).toBe('https://api.example.com/api')
   })
 
   it('refreshes a nearly expired access token before calling the API', async () => {

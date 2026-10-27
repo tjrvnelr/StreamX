@@ -1,33 +1,20 @@
 # StreamX
 
-A responsive video streaming app built with React, Vite, TypeScript, Tailwind CSS, shadcn-style accessible primitives, Supabase, and Cloudflare R2. The interface uses a dark neumorphic surface system with an optional light theme.
+StreamX is a video discovery and creator app. Browse, search, and watch videos; signed-in users can save videos, keep watch history, create playlists, upload videos, and manage their creator profile and uploads.
 
-## Included
+## Features
 
-- Dynamic Supabase catalog search across title, description, creator, category, and tags.
-- Home, explore, categories, trending, video detail/player, library, upload, creator dashboard, and account settings routes.
-- Email/password sign-in, sign-up verification, password reset, profiles, watch history/progress, Watch later, likes, and playlists.
-- HTML5 playback with keyboard controls, playback speed, picture-in-picture, fullscreen, captions, retry, resume progress, and an hls.js playback path for future authorized manifests.
-- Private R2 direct uploads with signed single PUTs, multipart uploads, progress, thumbnail upload, server-side size/type checks, and owner-bound cleanup.
-- PostgreSQL migration with indexes, constraints, profile creation, search and creator-metric RPCs, and RLS policies.
-- Clearly labeled local preview content when Supabase environment values are missing. Preview metrics never appear in configured production mode.
+- Home feed with featured, popular, recent, categorized, and continue-watching sections.
+- Search and discovery by title, description, creator, category, and tag, with relevance, newest, and popular sorting.
+- Video playback with resume progress, playback controls, and support for direct video files and HLS streams.
+- Signed-in library for watch history, Watch later, liked videos, and playlists.
+- Creator uploads to Cloudflare R2, with upload progress, retry support, thumbnails, and public, unlisted, or private visibility.
+- Creator dashboard for upload status and view metrics, plus profile, password-reset, and theme settings.
+- Preview catalog when Supabase is not configured. Preview content is illustrative; account, library, and creator features require the backend services.
 
-## Run locally
+## Tech stack
 
-1. Copy `.env.example` to `.env` and fill in the Supabase and R2 values.
-2. Apply `supabase/migrations/202610270001_streamx_schema.sql` and `supabase/seed.sql`.
-3. Run `npm install` and `npm run dev:all`.
-
-See [deployment setup](docs/deployment.md) for R2 CORS, secret handling, frontend/API deployment, and infrastructure limits. Architecture and phase boundaries are in [docs/architecture.md](docs/architecture.md).
-
-## Build and test
-
-```sh
-npm run build
-npm run build:server
-npm test
-npx playwright install chromium
-npm run test:e2e
-```
-
-The backend is a separate Node service. Browser credentials use only the Supabase anon key; Supabase service-role and R2 keys must stay on the server. HLS transcoding, private HLS delivery, OAuth, notifications, and asynchronous high-volume deletion require additional infrastructure.
+- React 19, TypeScript, Vite, Tailwind CSS, and React Router
+- Supabase Auth and Postgres, including row-level security
+- Express API with Cloudflare R2 object storage and presigned upload/playback URLs
+- Vitest and Testing Library for unit tests; Playwright for end-to-end tests
