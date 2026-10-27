@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { apiRequest, normalizeApiBase } from './api'
+import { apiRequest, normalizeApiBase, resolveApiBase } from './api'
 
 const auth = vi.hoisted(() => ({ getSession: vi.fn(), refreshSession: vi.fn() }))
 vi.mock('./supabase', () => ({ supabase: { auth } }))
@@ -28,6 +28,11 @@ describe('apiRequest', () => {
     expect(normalizeApiBase(undefined)).toBe('/api')
     expect(normalizeApiBase('https://api.example.com')).toBe('https://api.example.com/api')
     expect(normalizeApiBase('https://api.example.com/api/')).toBe('https://api.example.com/api')
+  })
+
+  it('does not silently point a production build at the frontend origin when the API URL is missing', () => {
+    expect(resolveApiBase(undefined, true)).toBe('')
+    expect(resolveApiBase(undefined, false)).toBe('/api')
   })
 
   it('refreshes a nearly expired access token before calling the API', async () => {

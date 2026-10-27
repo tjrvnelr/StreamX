@@ -6,7 +6,13 @@ export function normalizeApiBase(value?: string) {
   return `${base}/api`
 }
 
-const apiBase = normalizeApiBase(import.meta.env.VITE_API_URL)
+export function resolveApiBase(value: string | undefined, production: boolean) {
+  const configured = value?.trim()
+  if (!configured) return production ? '' : '/api'
+  return normalizeApiBase(configured)
+}
+
+const apiBase = resolveApiBase(import.meta.env.VITE_API_URL, import.meta.env.PROD)
 
 function unexpectedResponseMessage(response: Response, requestUrl: string) {
   const target = response.url || requestUrl
@@ -44,6 +50,7 @@ async function getAccessToken() {
 }
 
 export async function apiRequest<T>(path: string, init: RequestInit = {}): Promise<T> {
+  if (!apiBase) throw new ApiError('VITE_API_URL is missing from this production build. In Vercel, set it to the separate API service URL ending in /api, then rebuild and redeploy.', 0)
   const token = await getAccessToken()
   const headers = new Headers(init.headers)
   if (token) headers.set('Authorization', `Bearer ${token}`)
