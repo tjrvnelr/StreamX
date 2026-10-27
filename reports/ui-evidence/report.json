@@ -1,0 +1,53 @@
+{
+  "contract": "docs/architecture.md#product-contract: responsive neumorphic StreamX with 390x844 mobile and 1440x900 desktop layouts",
+  "targetViewports": [
+    "390x844",
+    "1440x900"
+  ],
+  "accessibility": {
+    "status": "pass",
+    "evidence": "Playwright keyboard checks showed the skip link with a visible 2px focus outline, moved through search suggestions with ArrowDown and Enter, and verified the reduced-motion animation duration. Browser contrast assertions verified the dim text token is at least 4.5:1 against canvas, surface, raised, and lifted surfaces in dark and light themes. Search and navigation controls have accessible names."
+  },
+  "responsive": {
+    "status": "pass",
+    "evidence": "Rendered and checked both 390x844 mobile and 1440x900 desktop. Mobile exposes its navigation drawer and search; both viewports fit without horizontal overflow. Desktop shows the persistent sidebar, centered search, and multi-column card grid."
+  },
+  "contentStates": {
+    "loading": {
+      "status": "not-applicable",
+      "reason": "The browser evidence run used isolated preview mode, so catalog reads used bundled records instead of delayed remote Supabase queries; live catalog loading was not exercised."
+    },
+    "empty": {
+      "status": "pass",
+      "evidence": "Searching for a no-match phrase displayed the empty-results message and a Clear filters action; clearing it restored the preview catalog."
+    },
+    "error": {
+      "status": "pass",
+      "evidence": "Opening an unavailable video displayed an alert with a useful message and Try again recovery action."
+    },
+    "partial": {
+      "status": "pass",
+      "evidence": "The home feed labels its bundled sample titles and counts as Preview mode and explains that Supabase is required for live catalog data."
+    },
+    "success": {
+      "status": "pass",
+      "evidence": "The home feed displayed featured and recommended videos; selecting Documentary filtered the feed and updated its heading. Search suggestions and theme switching also completed in browser checks."
+    },
+    "permission": {
+      "status": "pass",
+      "evidence": "In isolated preview mode, the upload route displays Connect your creator account and withholds upload controls. Live session authorization and R2 upload permissions require the configured services and were not exercised in this UI run."
+    }
+  },
+  "renderedEvidence": [
+    {
+      "viewport": "1440x900",
+      "artifact": "1440x900.png",
+      "observation": "Default dark desktop feed with the persistent sidebar, top search, featured video, category filters, and recommended card grid. Unavailable sample image URLs fall back to category-colored artwork without broken-image marks."
+    },
+    {
+      "viewport": "390x844",
+      "artifact": "390x844.png",
+      "observation": "Mobile feed with compact header, search, preview notice, featured video, and accessible menu control. The viewport has no horizontal overflow and uses the same category-colored artwork fallback."
+    }
+  ]
+}
