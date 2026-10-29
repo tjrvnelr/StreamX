@@ -94,6 +94,10 @@ export function Sidebar({ mobileOpen, onClose, collapsed, onToggle }: SidebarPro
         <NavItem label="My uploads" to="/dashboard" icon={Video} collapsed={actualCollapsed} onClick={closeOnNavigate} />
         <NavItem label="Upload video" to="/upload" icon={UploadCloud} collapsed={actualCollapsed} onClick={closeOnNavigate} />
       </nav>
+
+      <div className="mt-4 border-t border-line/70 pt-3">
+        <NavItem label="Settings" to="/settings" icon={Settings2} collapsed={actualCollapsed} onClick={closeOnNavigate} />
+      </div>
     </aside>
   </>
 }
