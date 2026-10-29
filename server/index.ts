@@ -405,7 +405,7 @@ app.use((error: unknown, _req: Request, res: Response, _next: NextFunction) => {
 // Serve the frontend static files in production
 const distPath = path.resolve(import.meta.dirname, '..', 'dist')
 app.use(express.static(distPath))
-app.get('*', (_req, res) => {
+app.get('/{*path}', (_req, res) => {
   res.sendFile(path.join(distPath, 'index.html'))
 })
 
