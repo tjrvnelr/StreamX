@@ -37,10 +37,10 @@ function NavItem({ label, to, icon: Icon, collapsed, onClick }: { label: string;
     className={({ isActive }) => cn(
       'group relative flex h-11 items-center gap-3 rounded-2xl px-3.5 text-sm font-medium transition-colors',
       collapsed && 'justify-center px-0',
-      isActive ? 'bg-violet/10 text-violet shadow-inset-sm' : 'text-muted hover:bg-lifted/70 hover:text-ink',
+      isActive ? 'bg-brand/10 text-brand shadow-inset-sm' : 'text-muted hover:bg-lifted/70 hover:text-ink',
     )}
   >
-    {({ isActive }) => <><Icon aria-hidden="true" className={cn('size-[18px] shrink-0 transition-transform group-hover:scale-105', isActive && 'text-violet')} />{!collapsed && <span className="truncate">{label}</span>}</>}
+    {({ isActive }) => <><Icon aria-hidden="true" className={cn('size-[18px] shrink-0 transition-transform group-hover:scale-105', isActive && 'text-brand')} />{!collapsed && <span className="truncate">{label}</span>}</>}
   </NavLink>
 }
 
@@ -57,8 +57,8 @@ export function Sidebar({ mobileOpen, onClose, collapsed, onToggle }: SidebarPro
     )}>
       <div className={cn('mb-8 flex h-11 items-center', actualCollapsed ? 'justify-center' : 'justify-between px-1')}>
         <NavLink to="/" onClick={closeOnNavigate} className="flex items-center gap-3 rounded-xl" aria-label="StreamX home">
-          <span className="flex size-9 items-center justify-center rounded-[14px] bg-violet text-[#16141e] shadow-accent"><Clapperboard className="size-[18px]" strokeWidth={2.4} /></span>
-          {!actualCollapsed && <span className="text-[19px] font-extrabold tracking-[-0.06em] text-ink">stream<span className="text-violet">x</span></span>}
+          <span className="flex size-9 items-center justify-center rounded-[14px] bg-gradient-to-br from-brand-dark to-brand text-white shadow-accent"><Clapperboard className="size-[18px]" strokeWidth={2.4} /></span>
+          {!actualCollapsed && <span className="text-[19px] font-extrabold tracking-[-0.06em] text-ink">stream<span className="text-brand">x</span></span>}
         </NavLink>
         <IconButton aria-label="Close navigation" variant="ghost" className="size-9 lg:hidden" onClick={closeOnNavigate}><X className="size-4" /></IconButton>
         {!actualCollapsed && <IconButton aria-label="Collapse sidebar" variant="ghost" className="hidden size-8 lg:inline-flex" onClick={onToggle}><ChevronLeft className="size-4" /></IconButton>}

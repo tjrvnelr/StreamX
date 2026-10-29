@@ -73,20 +73,20 @@ export function SearchBox({ compact = false }: { compact?: boolean }) {
         aria-controls="search-suggestions"
         autoComplete="off"
         placeholder="Search videos, creators, and more"
-        className="h-11 w-full rounded-2xl border border-line/70 bg-surface pl-11 pr-[76px] text-sm text-ink shadow-inset-sm placeholder:text-dim focus:border-violet/50 focus:outline-none focus:ring-2 focus:ring-violet/10"
+        className="h-11 w-full rounded-2xl border border-line/70 bg-surface pl-11 pr-[76px] text-sm text-ink shadow-inset-sm placeholder:text-dim focus:border-brand/50 focus:outline-none focus:ring-2 focus:ring-brand/10"
       />
       {query && <button type="button" onClick={() => { setQuery(''); setSuggestions([]); setResultQuery(''); setLoading(false) }} className="absolute right-[54px] rounded-lg px-2 py-1 text-[11px] text-dim hover:text-ink">Clear</button>}
-      <button type="submit" aria-label="Submit search" className="absolute right-1.5 flex size-8 items-center justify-center rounded-xl bg-lifted/80 text-muted transition hover:bg-violet hover:text-[#17151d]"><Search className="size-4" /></button>
+      <button type="submit" aria-label="Submit search" className="absolute right-1.5 flex size-8 items-center justify-center rounded-xl bg-lifted/80 text-muted transition hover:bg-brand hover:text-brand-foreground"><Search className="size-4" /></button>
     </form>
     {open && query.trim().length >= 2 && <div id="search-suggestions" role="listbox" aria-label="Search suggestions" className="neumorphic absolute left-0 right-0 top-[calc(100%+10px)] z-40 overflow-hidden rounded-2xl border border-line/70 p-2 shadow-soft-lg">
       {loading || resultQuery !== query.trim() ? <div className="flex items-center gap-2 px-3 py-3 text-xs text-muted"><Sparkles className="size-3.5 animate-pulse" />Searching StreamX…</div>
         : suggestions.length ? <>
-          {suggestions.map((video, index) => <button key={video.id} type="button" role="option" aria-selected={activeIndex === index} onMouseDown={(event) => event.preventDefault()} onClick={() => { setOpen(false); navigate(`/watch/${video.id}`) }} className={`flex w-full items-center gap-3 rounded-xl p-2 text-left transition ${activeIndex === index ? 'bg-violet/10' : 'hover:bg-lifted/70'}`}>
+          {suggestions.map((video, index) => <button key={video.id} type="button" role="option" aria-selected={activeIndex === index} onMouseDown={(event) => event.preventDefault()} onClick={() => { setOpen(false); navigate(`/watch/${video.id}`) }} className={`flex w-full items-center gap-3 rounded-xl p-2 text-left transition ${activeIndex === index ? 'bg-brand/10' : 'hover:bg-lifted/70'}`}>
             <VideoArtwork video={video} className="size-12 shrink-0 rounded-lg bg-lifted" />
             <span className="min-w-0 flex-1"><span className="block truncate text-xs font-semibold text-ink">{video.title}</span><span className="mt-1 block truncate text-[11px] text-muted">{video.creator.displayName}</span></span>
             <ArrowUpRight className="size-4 shrink-0 text-dim" />
           </button>)}
-          <button type="button" onClick={() => submit()} className="mt-1 flex w-full items-center justify-between border-t border-line/60 px-3 py-3 text-left text-xs font-semibold text-violet hover:text-ink">See all results <ArrowUpRight className="size-3.5" /></button>
+          <button type="button" onClick={() => submit()} className="mt-1 flex w-full items-center justify-between border-t border-line/60 px-3 py-3 text-left text-xs font-semibold text-brand hover:text-ink">See all results <ArrowUpRight className="size-3.5" /></button>
         </> : <div className="px-3 py-3 text-xs text-muted">No suggestions yet. Press Enter to search the full catalog.</div>}
     </div>}
   </div>

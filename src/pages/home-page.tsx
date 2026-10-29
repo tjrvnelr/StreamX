@@ -14,8 +14,8 @@ type ContinueItem = { video: Video; progressSeconds: number }
 
 function SectionTitle({ eyebrow, title, to }: { eyebrow?: string; title: string; to?: string }) {
   return <div className="mb-4 flex items-end justify-between gap-3 sm:mb-5">
-    <div>{eyebrow && <p className="mb-1.5 text-[9px] font-extrabold uppercase tracking-[0.18em] text-violet">{eyebrow}</p>}<h2 className="text-lg font-bold tracking-[-0.04em] text-ink sm:text-xl">{title}</h2></div>
-    {to && <Link to={to} className="inline-flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-xs font-semibold text-muted transition hover:text-violet">See all <ArrowRight className="size-3.5" /></Link>}
+    <div>{eyebrow && <p className="mb-1.5 text-[9px] font-extrabold uppercase tracking-[0.18em] text-brand">{eyebrow}</p>}<h2 className="text-lg font-bold tracking-[-0.04em] text-ink sm:text-xl">{title}</h2></div>
+    {to && <Link to={to} className="inline-flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-xs font-semibold text-muted transition hover:text-brand">See all <ArrowRight className="size-3.5" /></Link>}
   </div>
 }
 
@@ -64,7 +64,7 @@ export function HomePage() {
   }, [load])
 
   return <div className="animate-fade-up space-y-9 sm:space-y-11">
-    {preview && <div role="status" className="flex flex-wrap items-center gap-x-2 gap-y-1 rounded-2xl border border-violet/20 bg-violet/[0.06] px-4 py-2.5 text-[11px] leading-5 text-muted"><Sparkles className="size-3.5 shrink-0 text-violet" /><span><strong className="font-bold text-ink">Preview mode.</strong> Sample titles and counts are illustrative; configure Supabase to browse live catalog data.</span></div>}
+    {preview && <div role="status" className="flex flex-wrap items-center gap-x-2 gap-y-1 rounded-2xl border border-brand/20 bg-brand/[0.06] px-4 py-2.5 text-[11px] leading-5 text-muted"><Sparkles className="size-3.5 shrink-0 text-brand" /><span><strong className="font-bold text-ink">Preview mode.</strong> Sample titles and counts are illustrative; configure Supabase to browse live catalog data.</span></div>}
 
     {error ? <ErrorState message={error} onRetry={() => void load()} /> : <>
       {featured ? <section aria-label="Featured video" className="relative isolate min-h-[360px] overflow-hidden rounded-[30px] border border-line/50 bg-raised shadow-soft sm:min-h-[400px] lg:min-h-[440px]">
@@ -73,7 +73,7 @@ export function HomePage() {
         <div className="absolute inset-0 -z-10 bg-gradient-to-r from-[#0a0c10]/95 via-[#0a0c10]/60 to-[#0a0c10]/5" />
         <div className="absolute inset-0 -z-10 bg-gradient-to-t from-[#0a0c10]/60 via-transparent to-[#0a0c10]/10" />
         <div className="flex min-h-[360px] max-w-2xl flex-col items-start justify-end px-6 py-8 sm:min-h-[400px] sm:px-9 sm:py-10 lg:min-h-[440px] lg:px-12 lg:py-12">
-          <div className="mb-5 flex flex-wrap items-center gap-2"><Badge className="border-white/15 bg-white/10 text-white/85"><Sparkles className="size-3 text-violet" />Featured for you</Badge>{featured.category && <Badge className="border-white/15 bg-black/20 text-white/80">{featured.category.name}</Badge>}</div>
+          <div className="mb-5 flex flex-wrap items-center gap-2"><Badge className="border-white/15 bg-white/10 text-white/85"><Sparkles className="size-3 text-brand" />Featured for you</Badge>{featured.category && <Badge className="border-white/15 bg-black/20 text-white/80">{featured.category.name}</Badge>}</div>
           <h1 className="max-w-xl text-[clamp(2rem,5vw,3.6rem)] font-extrabold leading-[1.04] tracking-[-0.065em] text-white">{featured.title}</h1>
           <p className="mt-4 line-clamp-2 max-w-lg text-sm leading-6 text-white/75 sm:text-[15px]">{featured.description}</p>
           <div className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] font-medium text-white/70"><span>{featured.creator.displayName}</span><span aria-hidden="true">·</span><span>{formatViews(featured.viewCount)}</span><span aria-hidden="true">·</span><span>{formatDuration(featured.durationSeconds)}</span></div>
@@ -83,7 +83,7 @@ export function HomePage() {
       </section> : loading ? <div aria-label="Loading featured video" className="min-h-[360px] animate-pulse rounded-[30px] bg-raised shadow-inset-sm sm:min-h-[400px] lg:min-h-[440px]" /> : <EmptyState title="Your feed is ready for its first video" description="When creators publish videos, they will appear here. Explore categories or try a search to get started." action="Explore videos" onAction={() => navigate('/explore')} />}
 
       <section aria-label="Video categories" className="scrollbar-hidden -mx-1 flex gap-2 overflow-x-auto px-1 pb-1">
-        {(categories.length ? categories : [{ name: 'All', slug: 'all' }]).map((category) => <button key={category.slug} type="button" onClick={() => setSelectedCategory(category.slug)} aria-pressed={selectedCategory === category.slug} className={`whitespace-nowrap rounded-full border px-4 py-2 text-[11px] font-semibold transition ${selectedCategory === category.slug ? 'border-violet/35 bg-violet text-[#17151d] shadow-accent' : 'border-line/70 bg-surface text-muted shadow-soft-sm hover:text-ink'}`}>{category.name}</button>)}
+        {(categories.length ? categories : [{ name: 'All', slug: 'all' }]).map((category) => <button key={category.slug} type="button" onClick={() => setSelectedCategory(category.slug)} aria-pressed={selectedCategory === category.slug} className={`whitespace-nowrap rounded-full border px-4 py-2 text-[11px] font-semibold transition ${selectedCategory === category.slug ? 'border-brand/35 bg-brand text-brand-foreground shadow-accent' : 'border-line/70 bg-surface text-muted shadow-soft-sm hover:text-ink'}`}>{category.name}</button>)}
       </section>
 
       {continueWatching.length > 0 && <section aria-label="Continue watching">

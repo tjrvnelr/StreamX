@@ -13,7 +13,7 @@ const DashboardPage = lazy(() => import('./pages/dashboard-page').then((module) 
 const SettingsPage = lazy(() => import('./pages/settings-page').then((module) => ({ default: module.SettingsPage })))
 
 function NotFoundPage() {
-  return <div className="mx-auto flex min-h-[55vh] max-w-lg flex-col items-center justify-center text-center"><span className="text-6xl font-extrabold tracking-[-0.08em] text-violet">404</span><h1 className="mt-4 text-2xl font-bold text-ink">This page went off air</h1><p className="mt-2 text-sm leading-6 text-muted">The link may have changed, or the page may no longer be available.</p><Link to="/"><Button variant="raised" className="mt-6"><ArrowLeft className="size-4" />Back to StreamX</Button></Link></div>
+  return <div className="mx-auto flex min-h-[55vh] max-w-lg flex-col items-center justify-center text-center"><span className="text-6xl font-extrabold tracking-[-0.08em] text-brand">404</span><h1 className="mt-4 text-2xl font-bold text-ink">This page went off air</h1><p className="mt-2 text-sm leading-6 text-muted">The link may have changed, or the page may no longer be available.</p><Link to="/"><Button variant="raised" className="mt-6"><ArrowLeft className="size-4" />Back to StreamX</Button></Link></div>
 }
 
 function PageFallback() {

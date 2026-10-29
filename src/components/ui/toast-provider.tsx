@@ -18,7 +18,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     {children}
     <div aria-live="polite" aria-relevant="additions removals" className="fixed bottom-5 right-4 z-[100] flex w-[min(94vw,370px)] flex-col gap-2 sm:right-6">
       {items.map((item) => <div key={item.id} role={item.kind === 'error' ? 'alert' : 'status'} className="neumorphic flex items-start gap-3 rounded-2xl border border-line/70 px-4 py-3.5 shadow-soft-lg">
-        {item.kind === 'success' ? <Check className="mt-0.5 size-4 shrink-0 text-mint" /> : <CircleAlert className={`mt-0.5 size-4 shrink-0 ${item.kind === 'error' ? 'text-red-300' : 'text-violet'}`} />}
+        {item.kind === 'success' ? <Check className="mt-0.5 size-4 shrink-0 text-mint" /> : <CircleAlert className={`mt-0.5 size-4 shrink-0 ${item.kind === 'error' ? 'text-red-300' : 'text-brand'}`} />}
         <p className="flex-1 text-xs leading-5 text-ink">{item.message}</p>
         <IconButton aria-label="Dismiss message" size="icon" variant="ghost" className="-mr-2 -mt-1 size-7" onClick={() => dismiss(item.id)}><X className="size-3.5" /></IconButton>
       </div>)}

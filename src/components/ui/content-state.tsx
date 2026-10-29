@@ -11,7 +11,7 @@ export function VideoGridSkeleton({ count = 8 }: { count?: number }) {
 }
 
 export function LoadingState({ label = 'Loading your videos' }: { label?: string }) {
-  return <div role="status" className="flex min-h-64 flex-col items-center justify-center gap-3 text-center text-sm text-muted"><LoaderCircle className="size-6 animate-spin text-violet" /><span>{label}</span></div>
+  return <div role="status" className="flex min-h-64 flex-col items-center justify-center gap-3 text-center text-sm text-muted"><LoaderCircle className="size-6 animate-spin text-brand" /><span>{label}</span></div>
 }
 
 export function ErrorState({ message, onRetry }: { message: string; onRetry?: () => void }) {
@@ -25,7 +25,7 @@ export function ErrorState({ message, onRetry }: { message: string; onRetry?: ()
 
 export function EmptyState({ title, description, action, onAction }: { title: string; description: string; action?: string; onAction?: () => void }) {
   return <div className="neumorphic flex min-h-64 flex-col items-center justify-center rounded-[26px] border border-line/60 px-6 py-10 text-center shadow-soft">
-    <span className="flex size-12 items-center justify-center rounded-2xl bg-lifted text-violet shadow-soft-sm"><Search className="size-5" /></span>
+    <span className="flex size-12 items-center justify-center rounded-2xl bg-lifted text-brand shadow-soft-sm"><Search className="size-5" /></span>
     <h2 className="mt-4 text-base font-bold text-ink">{title}</h2>
     <p className="mt-2 max-w-sm text-sm leading-6 text-muted">{description}</p>
     {action && onAction && <Button variant="raised" size="sm" className="mt-5" onClick={onAction}>{action}</Button>}

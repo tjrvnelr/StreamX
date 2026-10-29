@@ -1,7 +1,7 @@
 import { forwardRef, type InputHTMLAttributes, type TextareaHTMLAttributes } from 'react'
 import { cn } from '../../lib/cn'
 
-const inputClasses = 'w-full rounded-2xl border border-line/70 bg-surface px-4 text-sm text-ink shadow-inset-sm placeholder:text-dim focus:border-violet/60 focus:outline-none focus:ring-2 focus:ring-violet/20 disabled:opacity-50'
+const inputClasses = 'w-full rounded-2xl border border-line/70 bg-surface px-4 text-sm text-ink shadow-inset-sm placeholder:text-dim focus:border-brand/60 focus:outline-none focus:ring-2 focus:ring-brand/20 disabled:opacity-50'
 
 export const Input = forwardRef<HTMLInputElement, InputHTMLAttributes<HTMLInputElement>>(function Input(
   { className, ...props },

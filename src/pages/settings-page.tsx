@@ -54,7 +54,7 @@ export function SettingsPage() {
   if (!user) return <div className="mx-auto max-w-2xl"><EmptyState title={isSupabaseConfigured ? 'Sign in to open settings' : 'Account settings'} description={isSupabaseConfigured ? 'Your profile and sign-in options are available after you sign in.' : 'Connect Supabase to manage a profile and account.'} action={isSupabaseConfigured ? 'Sign in' : undefined} onAction={isSupabaseConfigured ? openAuth : undefined} /></div>
 
   return <div className="mx-auto max-w-4xl animate-fade-up space-y-7">
-    <header><p className="mb-2 flex items-center gap-2 text-[10px] font-extrabold uppercase tracking-[0.17em] text-violet"><UserRound className="size-3.5" />Account</p><h1 className="text-3xl font-extrabold tracking-[-0.06em] text-ink sm:text-[38px]">Settings</h1><p className="mt-2 text-sm text-muted">Manage how you show up on StreamX.</p></header>
+    <header><p className="mb-2 flex items-center gap-2 text-[10px] font-extrabold uppercase tracking-[0.17em] text-brand"><UserRound className="size-3.5" />Account</p><h1 className="text-3xl font-extrabold tracking-[-0.06em] text-ink sm:text-[38px]">Settings</h1><p className="mt-2 text-sm text-muted">Manage how you show up on StreamX.</p></header>
 
     <section aria-labelledby="profile-heading" className="neumorphic rounded-[26px] border border-line/50 p-5 shadow-soft sm:p-7">
       <div className="mb-5"><h2 id="profile-heading" className="text-base font-bold text-ink">Public profile</h2><p className="mt-1 text-xs text-muted">This information is visible alongside your published videos.</p></div>
@@ -74,6 +74,6 @@ export function SettingsPage() {
         <div className="flex flex-wrap items-center justify-between gap-4 py-4"><div><p className="text-xs font-semibold text-ink">Sign out</p><p className="mt-1 text-xs text-muted">End this session on this device.</p></div><Button variant="outline" size="sm" onClick={() => void signOut()}><LogOut className="size-4" />Sign out</Button></div>
       </div>
     </section>
-    <div className="text-center text-[10px] text-dim"><Link to="/library" className="hover:text-violet">Back to your library</Link></div>
+    <div className="text-center text-[10px] text-dim"><Link to="/library" className="hover:text-brand">Back to your library</Link></div>
   </div>
 }
