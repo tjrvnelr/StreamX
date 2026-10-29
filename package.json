@@ -4,9 +4,10 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "dev:server": "tsx watch server/index.ts",
-    "dev:all": "concurrently -k \"npm:dev\" \"npm:dev:server\"",
+    "dev": "concurrently -k \"npm:dev:frontend\" \"npm:dev:server\"",
+    "dev:frontend": "vite",
+    "dev:server": "tsc -p tsconfig.server.json && concurrently -k \"tsc -p tsconfig.server.json --watch\" \"node --watch .server-build/server/index.js\"",
+    "dev:all": "npm:dev",
     "server": "tsx server/index.ts",
     "start": "node .server-build/server/index.js",
     "r2:cors:check": "node scripts/r2-cors.mjs --check",

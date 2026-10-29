@@ -29,7 +29,16 @@ app.disable('x-powered-by')
 app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }))
 app.use(cors({
   origin(origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) callback(null, true)
+    const isLocalDevelopmentOrigin = (() => {
+      if (!origin || process.env.NODE_ENV === 'production') return false
+      try {
+        const parsed = new URL(origin)
+        return parsed.protocol === 'http:' && ['localhost', '127.0.0.1', '[::1]'].includes(parsed.hostname)
+      } catch {
+        return false
+      }
+    })()
+    if (!origin || allowedOrigins.includes(origin) || isLocalDevelopmentOrigin) callback(null, true)
     else callback(new Error('Origin is not allowed'))
   },
   methods: ['GET', 'POST', 'DELETE', 'OPTIONS'],

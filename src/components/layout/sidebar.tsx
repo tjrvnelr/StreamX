@@ -1,4 +1,4 @@
-import { NavLink } from 'react-router-dom'
+import { NavLink, useLocation } from 'react-router-dom'
 import {
   Bookmark, ChevronLeft, Clapperboard, Compass, Flame, Heart, Home, Library, ListVideo,
   Menu, Settings2, Tags, UploadCloud, Video, X, Clock3,
@@ -29,18 +29,38 @@ const libraryLinks = [
 ]
 
 function NavItem({ label, to, icon: Icon, collapsed, onClick }: { label: string; to: string; icon: typeof Home; collapsed: boolean; onClick?: () => void }) {
+  const location = useLocation()
+
+  const [toPath, toSearch] = to.split('?')
+  const toParams = new URLSearchParams(toSearch || '')
+  const currentParams = new URLSearchParams(location.search)
+
+  let isActive: boolean
+  if (toSearch) {
+    // Link has query params — match path AND all specified query params
+    isActive = location.pathname === toPath &&
+      Array.from(toParams.entries()).every(([key, value]) => currentParams.get(key) === value)
+  } else if (to === '/') {
+    // Home — exact match only
+    isActive = location.pathname === '/'
+  } else {
+    // Regular path link — for '/library' only active when no tab param is set
+    isActive = location.pathname === toPath &&
+      (toPath === '/library' ? !currentParams.has('tab') : true)
+  }
+
   return <NavLink
     to={to}
-    end={to === '/'}
     onClick={onClick}
     title={collapsed ? label : undefined}
-    className={({ isActive }) => cn(
+    className={() => cn(
       'group relative flex h-11 items-center gap-3 rounded-2xl px-3.5 text-sm font-medium transition-colors',
       collapsed && 'justify-center px-0',
       isActive ? 'bg-brand/10 text-brand shadow-inset-sm' : 'text-muted hover:bg-lifted/70 hover:text-ink',
     )}
   >
-    {({ isActive }) => <><Icon aria-hidden="true" className={cn('size-[18px] shrink-0 transition-transform group-hover:scale-105', isActive && 'text-brand')} />{!collapsed && <span className="truncate">{label}</span>}</>}
+    <Icon aria-hidden="true" className={cn('size-[18px] shrink-0 transition-transform group-hover:scale-105', isActive && 'text-brand')} />
+    {!collapsed && <span className="truncate">{label}</span>}
   </NavLink>
 }
 
