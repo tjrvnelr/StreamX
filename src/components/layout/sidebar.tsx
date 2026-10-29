@@ -94,13 +94,6 @@ export function Sidebar({ mobileOpen, onClose, collapsed, onToggle }: SidebarPro
         <NavItem label="My uploads" to="/dashboard" icon={Video} collapsed={actualCollapsed} onClick={closeOnNavigate} />
         <NavItem label="Upload video" to="/upload" icon={UploadCloud} collapsed={actualCollapsed} onClick={closeOnNavigate} />
       </nav>
-
-      <div className="mt-4 border-t border-line/70 pt-3">
-        <NavItem label="Settings" to="/settings" icon={Settings2} collapsed={actualCollapsed} onClick={closeOnNavigate} />
-        {!actualCollapsed && <div className="mt-4 rounded-2xl border border-line/50 bg-raised/70 px-3.5 py-3 text-[11px] leading-5 text-dim">
-          <span className="font-semibold text-muted">Your next favorite</span><br />is one click away.
-        </div>}
-      </div>
     </aside>
   </>
 }
