@@ -23,4 +23,7 @@ if (!parsed.success) {
 
 export const env = parsed.data
 export const r2Endpoint = `https://${env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`
-export const allowedOrigins = env.FRONTEND_ORIGIN.split(',').map((origin) => origin.trim()).filter(Boolean)
+export const allowedOrigins = env.FRONTEND_ORIGIN
+  .split(',')
+  .map((origin) => origin.trim().replace(/\/+$/, ''))
+  .filter(Boolean)
