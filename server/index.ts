@@ -25,6 +25,7 @@ const admin = createClient(env.SUPABASE_URL, env.SUPABASE_SERVICE_ROLE_KEY, {
 })
 
 const app = express()
+app.set('trust proxy', 1)
 app.disable('x-powered-by')
 app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }))
 app.use(cors({
@@ -399,6 +400,13 @@ app.use((error: unknown, _req: Request, res: Response, _next: NextFunction) => {
   if (error instanceof SyntaxError) return errorResponse(res, 400, 'Invalid request body.')
   if (error instanceof Error && error.message === 'Origin is not allowed') return errorResponse(res, 403, 'This application origin is not allowed.')
   return errorResponse(res, 500, 'The server could not complete this request.')
+})
+
+// Serve the frontend static files in production
+const distPath = path.resolve(import.meta.dirname, '..', 'dist')
+app.use(express.static(distPath))
+app.get('*', (_req, res) => {
+  res.sendFile(path.join(distPath, 'index.html'))
 })
 
 if (process.env.NODE_ENV !== 'test') {
