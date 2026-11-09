@@ -11,10 +11,28 @@ import {
   orderBy,
   limit as firestoreLimit,
 } from 'firebase/firestore'
+import type { Query, QuerySnapshot, DocumentData } from 'firebase/firestore'
 import { apiRequest, jsonBody } from '../lib/api'
 import { auth, db } from '../lib/firebase'
 import { previewCategories, previewVideos } from '../data/preview-videos'
 import type { Category, Video, VideoSearchOptions, VideoSearchResult } from '../types/video'
+
+async function getDocsWithFallback<T = DocumentData>(
+  primaryQuery: Query<T>,
+  fallbackQuery: Query<T>,
+): Promise<QuerySnapshot<T>> {
+  try {
+    return await getDocs(primaryQuery)
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err)
+    const code = (err as { code?: string })?.code
+    if (code === 'failed-precondition' || msg.includes('requires an index') || msg.includes('indexes?create_composite=')) {
+      console.warn('Firestore composite index missing or building; falling back to in-memory sorting.', msg)
+      return await getDocs(fallbackQuery)
+    }
+    throw err
+  }
+}
 
 type FirestoreVideoDoc = Record<string, unknown> & {
   userId: string
@@ -118,32 +136,41 @@ export async function fetchCatalog(options: VideoSearchOptions = {}): Promise<Vi
   }
 
   const videosRef = collection(db, 'videos')
-  const constraints: Parameters<typeof query>[1][] = [
+  const filters: Parameters<typeof query>[1][] = [
     where('visibility', '==', 'public'),
     where('processingStatus', '==', 'ready'),
   ]
 
   if (category !== 'all') {
-    constraints.push(where('categorySlug', '==', category))
+    filters.push(where('categorySlug', '==', category))
   }
 
+  const orderClauses: Parameters<typeof query>[1][] = []
   if (sort === 'popular') {
-    constraints.push(orderBy('viewCount', 'desc'))
+    orderClauses.push(orderBy('viewCount', 'desc'))
   } else if (sort === 'newest') {
-    constraints.push(orderBy('publishedAt', 'desc'))
+    orderClauses.push(orderBy('publishedAt', 'desc'))
   } else {
-    constraints.push(orderBy('publishedAt', 'desc'))
+    orderClauses.push(orderBy('publishedAt', 'desc'))
   }
 
   const fetchCount = (page + 1) * pageSize + 1
-  constraints.push(firestoreLimit(fetchCount))
+  const primaryQuery = query(videosRef, ...filters, ...orderClauses, firestoreLimit(fetchCount))
+  const fallbackQuery = query(videosRef, ...filters, firestoreLimit(Math.max(fetchCount, 50)))
 
-  const q = query(videosRef, ...constraints)
-  const snapshot = await getDocs(q)
+  const snapshot = await getDocsWithFallback(primaryQuery, fallbackQuery)
   let allVideos = snapshot.docs.map((docSnap) => mapVideo(docSnap.id, docSnap.data() as FirestoreVideoDoc))
 
   const now = Date.now()
   allVideos = allVideos.filter((v) => v.publishedAt && new Date(v.publishedAt).getTime() <= now)
+
+  if (sort === 'popular') {
+    allVideos.sort((a, b) => b.viewCount - a.viewCount)
+  } else if (sort === 'newest') {
+    allVideos.sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt))
+  } else {
+    allVideos.sort((a, b) => +new Date(b.publishedAt || b.createdAt) - +new Date(a.publishedAt || a.createdAt))
+  }
 
   if (searchQuery.trim()) {
     const normalized = searchQuery.trim().toLowerCase()
@@ -180,14 +207,16 @@ export async function fetchVideo(id: string): Promise<{ video: Video | null; pre
 export async function fetchOwnerVideos(): Promise<Video[]> {
   if (!db || !auth?.currentUser) return []
   const userId = auth.currentUser.uid
-  const q = query(
+  const primary = query(
     collection(db, 'videos'),
     where('userId', '==', userId),
     orderBy('createdAt', 'desc'),
     firestoreLimit(100),
   )
-  const snapshot = await getDocs(q)
+  const fallback = query(collection(db, 'videos'), where('userId', '==', userId), firestoreLimit(100))
+  const snapshot = await getDocsWithFallback(primary, fallback)
   const videos = snapshot.docs.map((docSnap) => mapVideo(docSnap.id, docSnap.data() as FirestoreVideoDoc))
+  videos.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
   return signThumbnails(videos)
 }
 
@@ -226,15 +255,21 @@ export async function fetchProgress(videoId: string) {
 export async function fetchContinueWatching(): Promise<Array<{ video: Video; progressSeconds: number }>> {
   if (!db || !auth?.currentUser) return []
   const userId = auth.currentUser.uid
-  const q = query(
+  const primary = query(
     collection(db, 'watchHistory'),
     where('userId', '==', userId),
     where('completed', '==', false),
     orderBy('lastWatchedAt', 'desc'),
     firestoreLimit(6),
   )
-  const snapshot = await getDocs(q)
-  const items: Array<{ video: Video; progressSeconds: number }> = []
+  const fallback = query(
+    collection(db, 'watchHistory'),
+    where('userId', '==', userId),
+    where('completed', '==', false),
+    firestoreLimit(20),
+  )
+  const snapshot = await getDocsWithFallback(primary, fallback)
+  const items: Array<{ video: Video; progressSeconds: number; lastWatchedAt: string }> = []
   for (const historyDoc of snapshot.docs) {
     const historyData = historyDoc.data()
     const videoSnap = await getDoc(doc(db, 'videos', historyData.videoId))
@@ -242,11 +277,14 @@ export async function fetchContinueWatching(): Promise<Array<{ video: Video; pro
       items.push({
         video: mapVideo(videoSnap.id, videoSnap.data() as FirestoreVideoDoc),
         progressSeconds: historyData.progressSeconds,
+        lastWatchedAt: (historyData.lastWatchedAt as string) || '',
       })
     }
   }
-  const signed = await signThumbnails(items.map((item) => item.video))
-  return items.map((item, index) => ({ ...item, video: signed[index] }))
+  items.sort((a, b) => new Date(b.lastWatchedAt).getTime() - new Date(a.lastWatchedAt).getTime())
+  const trimmed = items.slice(0, 6)
+  const signed = await signThumbnails(trimmed.map((item) => item.video))
+  return trimmed.map((item, index) => ({ video: signed[index], progressSeconds: item.progressSeconds }))
 }
 
 export type LibraryVideoItem = { video: Video; progressSeconds?: number; completed?: boolean; addedAt?: string }
@@ -257,13 +295,18 @@ export async function fetchLibraryVideos(tab: LibraryTab): Promise<LibraryVideoI
   const userId = auth.currentUser.uid
   const collectionName = tab === 'history' ? 'watchHistory' : tab === 'later' ? 'watchLater' : 'videoLikes'
   const dateField = tab === 'history' ? 'lastWatchedAt' : tab === 'later' ? 'addedAt' : 'createdAt'
-  const q = query(
+  const primary = query(
     collection(db, collectionName),
     where('userId', '==', userId),
     orderBy(dateField, 'desc'),
     firestoreLimit(100),
   )
-  const snapshot = await getDocs(q)
+  const fallback = query(
+    collection(db, collectionName),
+    where('userId', '==', userId),
+    firestoreLimit(100),
+  )
+  const snapshot = await getDocsWithFallback(primary, fallback)
   const items: LibraryVideoItem[] = []
   for (const itemDoc of snapshot.docs) {
     const data = itemDoc.data()
@@ -277,6 +320,7 @@ export async function fetchLibraryVideos(tab: LibraryTab): Promise<LibraryVideoI
       })
     }
   }
+  items.sort((a, b) => new Date(b.addedAt || '').getTime() - new Date(a.addedAt || '').getTime())
   const signed = await signThumbnails(items.map((item) => item.video))
   return items.map((item, index) => ({ ...item, video: signed[index] }))
 }
@@ -286,17 +330,24 @@ export type Playlist = { id: string; name: string; description: string; visibili
 export async function fetchPlaylists(): Promise<Playlist[]> {
   if (!db || !auth?.currentUser) return []
   const userId = auth.currentUser.uid
-  const q = query(
+  const primary = query(
     collection(db, 'playlists'),
     where('userId', '==', userId),
     orderBy('createdAt', 'desc'),
     firestoreLimit(100),
   )
-  const snapshot = await getDocs(q)
-  return snapshot.docs.map((docSnap) => {
+  const fallback = query(
+    collection(db, 'playlists'),
+    where('userId', '==', userId),
+    firestoreLimit(100),
+  )
+  const snapshot = await getDocsWithFallback(primary, fallback)
+  const playlists = snapshot.docs.map((docSnap) => {
     const data = docSnap.data()
     return { id: docSnap.id, name: data.name, description: data.description, visibility: data.visibility, created_at: data.createdAt }
   })
+  playlists.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+  return playlists
 }
 
 export async function createPlaylist(name: string, description: string) {
@@ -322,17 +373,26 @@ export async function deletePlaylist(playlistId: string) {
 
 export async function fetchPlaylistVideos(playlistId: string) {
   if (!db) return []
-  const q = query(
+  const primary = query(
     collection(db, 'playlistVideos'),
     where('playlistId', '==', playlistId),
     orderBy('position'),
     firestoreLimit(100),
   )
-  const snapshot = await getDocs(q)
+  const fallback = query(
+    collection(db, 'playlistVideos'),
+    where('playlistId', '==', playlistId),
+    firestoreLimit(100),
+  )
+  const snapshot = await getDocsWithFallback(primary, fallback)
+  const entries: Array<{ videoId: string; position: number }> = snapshot.docs.map((d) => {
+    const data = d.data()
+    return { videoId: data.videoId as string, position: Number(data.position ?? 0) }
+  })
+  entries.sort((a, b) => a.position - b.position)
   const videos: Video[] = []
-  for (const pvDoc of snapshot.docs) {
-    const data = pvDoc.data()
-    const videoSnap = await getDoc(doc(db, 'videos', data.videoId))
+  for (const entry of entries) {
+    const videoSnap = await getDoc(doc(db, 'videos', entry.videoId))
     if (videoSnap.exists()) {
       videos.push(mapVideo(videoSnap.id, videoSnap.data() as FirestoreVideoDoc))
     }
@@ -343,9 +403,14 @@ export async function fetchPlaylistVideos(playlistId: string) {
 export async function addToPlaylist(playlistId: string, videoId: string) {
   if (!db) throw new Error('Connect Firebase to manage playlists.')
   if (!auth?.currentUser) throw new Error('Sign in to save videos to a playlist.')
-  const q = query(collection(db, 'playlistVideos'), where('playlistId', '==', playlistId), orderBy('position', 'desc'), firestoreLimit(1))
-  const snapshot = await getDocs(q)
-  const lastPosition = snapshot.docs.length ? (snapshot.docs[0].data().position ?? -1) : -1
+  const primary = query(collection(db, 'playlistVideos'), where('playlistId', '==', playlistId), orderBy('position', 'desc'), firestoreLimit(1))
+  const fallback = query(collection(db, 'playlistVideos'), where('playlistId', '==', playlistId), firestoreLimit(100))
+  const snapshot = await getDocsWithFallback(primary, fallback)
+  let lastPosition = -1
+  if (snapshot.docs.length > 0) {
+    const positions = snapshot.docs.map((d) => Number(d.data().position) || 0)
+    lastPosition = Math.max(...positions)
+  }
   const docId = `${playlistId}_${videoId}`
   await setDoc(doc(db, 'playlistVideos', docId), {
     playlistId,

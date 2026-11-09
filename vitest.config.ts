@@ -6,6 +6,8 @@ export default defineConfig({
   define: {
     'import.meta.env.VITE_SUPABASE_URL': JSON.stringify(''),
     'import.meta.env.VITE_SUPABASE_ANON_KEY': JSON.stringify(''),
+    'import.meta.env.VITE_FIREBASE_API_KEY': JSON.stringify(''),
+    'import.meta.env.VITE_FIREBASE_PROJECT_ID': JSON.stringify(''),
     'import.meta.env.VITE_API_URL': JSON.stringify('/api'),
   },
   test: {
