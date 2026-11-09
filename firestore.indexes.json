@@ -1,51 +1,108 @@
 {
-  // Example (Standard Edition):
-  //
-  // "indexes": [
-  //   {
-  //     "collectionGroup": "widgets",
-  //     "queryScope": "COLLECTION",
-  //     "fields": [
-  //       { "fieldPath": "foo", "arrayConfig": "CONTAINS" },
-  //       { "fieldPath": "bar", "mode": "DESCENDING" }
-  //     ]
-  //   },
-  //
-  //  "fieldOverrides": [
-  //    {
-  //      "collectionGroup": "widgets",
-  //      "fieldPath": "baz",
-  //      "indexes": [
-  //        { "order": "ASCENDING", "queryScope": "COLLECTION" }
-  //      ]
-  //    },
-  //   ]
-  // ]
-  //
-  // Example (Enterprise Edition):
-  //
-  // "indexes": [
-  //   {
-  //     "collectionGroup": "reviews",
-  //     "queryScope": "COLLECTION_GROUP",
-  //     "apiScope": "MONGODB_COMPATIBLE_API",
-  //     "density": "DENSE",
-  //     "multikey": false,
-  //     "fields": [
-  //       { "fieldPath": "baz", "mode": "ASCENDING" }
-  //     ]
-  //   },
-  //   {
-  //     "collectionGroup": "items",
-  //     "queryScope": "COLLECTION_GROUP",
-  //     "apiScope": "MONGODB_COMPATIBLE_API",
-  //     "density": "SPARSE_ANY",
-  //     "multikey": true,
-  //     "fields": [
-  //       { "fieldPath": "baz", "mode": "ASCENDING" }
-  //     ]
-  //   },
-  // ]
-  "indexes": [],
+  "indexes": [
+    {
+      "collectionGroup": "videos",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "processingStatus", "order": "ASCENDING" },
+        { "fieldPath": "visibility", "order": "ASCENDING" },
+        { "fieldPath": "viewCount", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "videos",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "processingStatus", "order": "ASCENDING" },
+        { "fieldPath": "visibility", "order": "ASCENDING" },
+        { "fieldPath": "publishedAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "videos",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "categorySlug", "order": "ASCENDING" },
+        { "fieldPath": "processingStatus", "order": "ASCENDING" },
+        { "fieldPath": "visibility", "order": "ASCENDING" },
+        { "fieldPath": "viewCount", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "videos",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "categorySlug", "order": "ASCENDING" },
+        { "fieldPath": "processingStatus", "order": "ASCENDING" },
+        { "fieldPath": "visibility", "order": "ASCENDING" },
+        { "fieldPath": "publishedAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "videos",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "userId", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "watchHistory",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "completed", "order": "ASCENDING" },
+        { "fieldPath": "userId", "order": "ASCENDING" },
+        { "fieldPath": "lastWatchedAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "watchHistory",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "userId", "order": "ASCENDING" },
+        { "fieldPath": "lastWatchedAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "watchLater",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "userId", "order": "ASCENDING" },
+        { "fieldPath": "addedAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "videoLikes",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "userId", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "playlists",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "userId", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "playlistVideos",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "playlistId", "order": "ASCENDING" },
+        { "fieldPath": "position", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "playlistVideos",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "playlistId", "order": "ASCENDING" },
+        { "fieldPath": "position", "order": "DESCENDING" }
+      ]
+    }
+  ],
   "fieldOverrides": []
 }
