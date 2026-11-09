@@ -8,7 +8,7 @@ import { EmptyState, ErrorState, LoadingState } from '../components/ui/content-s
 import { Badge } from '../components/ui/badge'
 import { Button, IconButton } from '../components/ui/button'
 import { useToast } from '../components/ui/toast-context'
-import { isSupabaseConfigured } from '../lib/supabase'
+import { isFirebaseConfigured } from '../lib/firebase'
 import { deleteVideo, fetchCreatorMetrics, fetchOwnerVideos, formatAge, formatViews, updateVideoVisibility, type CreatorMetrics } from '../services/videos'
 import type { Video } from '../types/video'
 
@@ -47,7 +47,7 @@ export function DashboardPage() {
   const [deleting, setDeleting] = useState('')
 
   const load = useCallback(async () => {
-    if (!isSupabaseConfigured || !user) { setLoading(false); return }
+    if (!isFirebaseConfigured || !user) { setLoading(false); return }
     setLoading(true)
     setError('')
     try {
@@ -86,7 +86,7 @@ export function DashboardPage() {
     finally { setDeleting('') }
   }
 
-  if (!user) return <div className="mx-auto max-w-2xl"><EmptyState title="Sign in to manage your videos" description={isSupabaseConfigured ? 'Your creator dashboard only shows uploads owned by your account.' : 'Connect Supabase and sign in to open creator tools.'} action={isSupabaseConfigured ? 'Sign in' : undefined} onAction={isSupabaseConfigured ? openAuth : undefined} /></div>
+  if (!user) return <div className="mx-auto max-w-2xl"><EmptyState title="Sign in to manage your videos" description={isFirebaseConfigured ? 'Your creator dashboard only shows uploads owned by your account.' : 'Connect Firebase and sign in to open creator tools.'} action={isFirebaseConfigured ? 'Sign in' : undefined} onAction={isFirebaseConfigured ? openAuth : undefined} /></div>
 
   return <div className="animate-fade-up space-y-8">
     <header className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end"><div><p className="mb-2 flex items-center gap-2 text-[10px] font-extrabold uppercase tracking-[0.17em] text-brand"><FileVideo2 className="size-3.5" />Creator studio</p><h1 className="text-3xl font-extrabold tracking-[-0.06em] text-ink sm:text-[38px]">Your uploads</h1><p className="mt-2 text-sm text-muted">Manage your videos and keep an eye on the real numbers.</p></div><Link to="/upload"><Button variant="primary"><Plus className="size-4" />Upload video</Button></Link></header>

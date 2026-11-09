@@ -8,7 +8,7 @@ import { Button, IconButton } from '../components/ui/button'
 import { Input, Textarea } from '../components/ui/input'
 import { useToast } from '../components/ui/toast-context'
 import { apiRequest, jsonBody } from '../lib/api'
-import { isSupabaseConfigured } from '../lib/supabase'
+import { isFirebaseConfigured } from '../lib/firebase'
 import { createUpload, fetchCategories } from '../services/videos'
 import type { Category, Video } from '../types/video'
 
@@ -150,7 +150,7 @@ export function UploadPage() {
   const [dragging, setDragging] = useState(false)
 
   useEffect(() => {
-    if (!isSupabaseConfigured) return
+    if (!isFirebaseConfigured) return
     void fetchCategories().then((result) => setCategories(result.categories.filter((item) => item.slug !== 'all' && item.id))).catch(() => undefined)
   }, [])
 
@@ -207,7 +207,7 @@ export function UploadPage() {
       setError('Add a video file and title before uploading.')
       return
     }
-    if (!user?.email_confirmed_at) {
+    if (!user?.emailVerified) {
       setError('Verify your email before uploading. Check your inbox for the confirmation link.')
       return
     }
@@ -337,14 +337,14 @@ export function UploadPage() {
 
   if (authLoading) return <div className="neumorphic mx-auto max-w-3xl animate-pulse rounded-[28px] p-10 shadow-soft"><div className="h-5 w-1/3 rounded bg-lifted" /><div className="mt-5 h-52 rounded-2xl bg-lifted" /></div>
 
-  if (!isSupabaseConfigured) return <div className="mx-auto max-w-2xl"><Link to="/" className="mb-6 inline-flex items-center gap-2 text-xs font-semibold text-muted hover:text-ink"><ArrowLeft className="size-4" />Back to StreamX</Link><EmptyState title="Connect your creator account" description="Upload uses Supabase Auth and a private Cloudflare R2 bucket. Add the Supabase and API credentials in your environment to enable it." /></div>
+  if (!isFirebaseConfigured) return <div className="mx-auto max-w-2xl"><Link to="/" className="mb-6 inline-flex items-center gap-2 text-xs font-semibold text-muted hover:text-ink"><ArrowLeft className="size-4" />Back to StreamX</Link><EmptyState title="Connect your creator account" description="Upload uses Firebase Auth and a private Cloudflare R2 bucket. Add the Firebase and API credentials in your environment to enable it." /></div>
   if (!user) return <div className="mx-auto max-w-2xl"><EmptyState title="Sign in to upload" description="Your uploads stay attached to your account, and you can choose who gets to watch each one." action="Sign in" onAction={openAuth} /></div>
 
   return <div className="mx-auto max-w-4xl animate-fade-up">
     <Link to="/dashboard" className="mb-6 inline-flex items-center gap-2 text-xs font-semibold text-muted hover:text-ink"><ArrowLeft className="size-4" />Creator studio</Link>
     <div className="mb-7 flex flex-col justify-between gap-4 sm:flex-row sm:items-end"><div><p className="mb-2 flex items-center gap-2 text-[10px] font-extrabold uppercase tracking-[0.17em] text-brand"><UploadCloud className="size-3.5" />Creator studio</p><h1 className="text-3xl font-extrabold tracking-[-0.06em] text-ink sm:text-[38px]">Upload a video</h1><p className="mt-2 max-w-xl text-sm leading-6 text-muted">Share a new story with the StreamX community.</p></div><Badge className="w-fit"><LockKeyhole className="size-3.5 text-mint" />Private R2 upload</Badge></div>
 
-    {!user.email_confirmed_at && <div role="alert" className="mb-5 rounded-2xl border border-amber-400/20 bg-amber-300/[0.05] p-4 text-sm leading-6 text-amber-100/80"><strong className="text-amber-100">Verify your email to upload.</strong> Follow the confirmation link we sent to {user.email}.</div>}
+    {!user.emailVerified && <div role="alert" className="mb-5 rounded-2xl border border-amber-400/20 bg-amber-300/[0.05] p-4 text-sm leading-6 text-amber-100/80"><strong className="text-amber-100">Verify your email to upload.</strong> Follow the confirmation link we sent to {user.email}.</div>}
 
     {status === 'success' ? <div className="neumorphic rounded-[28px] border border-mint/20 p-7 shadow-soft sm:p-9"><span className="flex size-12 items-center justify-center rounded-2xl bg-mint/10 text-mint"><CheckCircle2 className="size-6" /></span><h2 className="mt-5 text-2xl font-bold tracking-tight text-ink">Your video is ready</h2><p className="mt-2 text-sm leading-6 text-muted">{visibility === 'private' ? 'It is private and only visible to you.' : 'It is available according to the visibility setting you chose.'}</p>{warning && <p role="status" className="mt-3 text-xs text-amber-200">{warning}</p>}<div className="mt-6 flex flex-wrap gap-3"><Button variant="primary" onClick={() => navigate(`/watch/${uploadedVideoId}`)}>Open video</Button><Button variant="outline" onClick={() => navigate('/dashboard')}>View dashboard</Button><Button variant="ghost" onClick={() => { setFile(null); selectThumbnail(null); setTitle(''); setDescription(''); setTags(''); setProgress(0); setStatus('idle'); setUploadedVideoId('') }}>Upload another</Button></div></div> : <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_300px]">
       <div className="space-y-5">
@@ -379,7 +379,7 @@ export function UploadPage() {
         {error && <p role="alert" className="mb-4 rounded-2xl border border-red-300/20 bg-red-400/[0.06] px-4 py-3 text-xs leading-5 text-red-200">{error}</p>}
         {status === 'uploading' || status === 'completing' ? <div className="mb-5 rounded-2xl border border-line/70 bg-raised/70 p-4"><div className="flex items-center justify-between gap-4 text-xs"><span className="flex items-center gap-2 font-semibold text-ink">{status === 'completing' ? <LoaderCircle className="size-4 animate-spin text-brand" /> : <UploadCloud className="size-4 text-brand" />}{status === 'completing' ? 'Verifying upload…' : 'Uploading directly to R2…'}</span><span className="tabular-nums text-muted">{progress}%</span></div><div className="mt-3 h-2 overflow-hidden rounded-full bg-surface shadow-inset-sm"><div className="h-full rounded-full bg-brand transition-[width] duration-150" style={{ width: `${progress}%` }} /></div><p className="mt-2 text-[10px] text-dim">Slow uploads can take a while. Keep this tab open; interrupted chunks retry automatically.</p></div> : null}
         <div className="flex flex-wrap items-center justify-end gap-3">
-          {(status === 'uploading' || status === 'completing') ? <Button variant="outline" onClick={() => void cancelUpload()}><X className="size-4" />Cancel upload</Button> : status === 'cancelled' ? <Button variant="outline" onClick={() => setStatus('idle')}>Upload cancelled</Button> : <Button variant="primary" size="lg" disabled={!file || !title.trim() || !user.email_confirmed_at} onClick={() => void startUpload()}>{status === 'error' ? 'Retry upload' : 'Upload video'}<UploadCloud className="size-4" /></Button>}
+          {(status === 'uploading' || status === 'completing') ? <Button variant="outline" onClick={() => void cancelUpload()}><X className="size-4" />Cancel upload</Button> : status === 'cancelled' ? <Button variant="outline" onClick={() => setStatus('idle')}>Upload cancelled</Button> : <Button variant="primary" size="lg" disabled={!file || !title.trim() || !user.emailVerified} onClick={() => void startUpload()}>{status === 'error' ? 'Retry upload' : 'Upload video'}<UploadCloud className="size-4" /></Button>}
         </div>
       </div>
     </div>}

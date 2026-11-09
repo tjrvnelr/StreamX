@@ -7,7 +7,7 @@ import { EmptyState, ErrorState, VideoGridSkeleton } from '../components/ui/cont
 import { Button, IconButton } from '../components/ui/button'
 import { Input, Textarea } from '../components/ui/input'
 import { useToast } from '../components/ui/toast-context'
-import { isSupabaseConfigured } from '../lib/supabase'
+import { isFirebaseConfigured } from '../lib/firebase'
 import { createPlaylist, deletePlaylist, fetchLibraryVideos, fetchPlaylistVideos, fetchPlaylists, removeFromLibrary, removeFromPlaylist, type LibraryTab, type LibraryVideoItem, type Playlist } from '../services/videos'
 import type { Video } from '../types/video'
 
@@ -38,7 +38,7 @@ export function LibraryPage() {
   const [playlistDescription, setPlaylistDescription] = useState('')
 
   const load = useCallback(async () => {
-    if (!user || !isSupabaseConfigured) { setLoading(false); return }
+    if (!user || !isFirebaseConfigured) { setLoading(false); return }
     setLoading(true)
     setError('')
     try {
@@ -107,7 +107,7 @@ export function LibraryPage() {
     } catch (cause) { toast(cause instanceof Error ? cause.message : 'Playlist could not be deleted.', 'error') }
   }
 
-  if (!user) return <div className="mx-auto max-w-2xl"><EmptyState title={isSupabaseConfigured ? 'Sign in to open your library' : 'Your library starts here'} description={isSupabaseConfigured ? 'Your history, saved videos, and playlists stay private to your account.' : 'Connect Supabase and sign in to keep your history, likes, and playlists in sync.'} action={isSupabaseConfigured ? 'Sign in' : undefined} onAction={isSupabaseConfigured ? openAuth : undefined} /></div>
+  if (!user) return <div className="mx-auto max-w-2xl"><EmptyState title={isFirebaseConfigured ? 'Sign in to open your library' : 'Your library starts here'} description={isFirebaseConfigured ? 'Your history, saved videos, and playlists stay private to your account.' : 'Connect Firebase and sign in to keep your history, likes, and playlists in sync.'} action={isFirebaseConfigured ? 'Sign in' : undefined} onAction={isFirebaseConfigured ? openAuth : undefined} /></div>
 
   const selectedPlaylist = playlists.find((item) => item.id === selectedPlaylistId)
   const isPlaylistView = activeTab === 'playlists'

@@ -1,11 +1,42 @@
 import { useState, type FormEvent } from 'react'
 import * as Dialog from '@radix-ui/react-dialog'
 import { ArrowRight, AtSign, CheckCircle2, LockKeyhole, X } from 'lucide-react'
-import { supabase } from '../../lib/supabase'
+import {
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  sendPasswordResetEmail,
+  sendEmailVerification,
+} from 'firebase/auth'
+import { auth } from '../../lib/firebase'
 import { Button, IconButton } from '../ui/button'
 import { Input } from '../ui/input'
 
 type Mode = 'signin' | 'signup' | 'forgot'
+
+function firebaseErrorMessage(code?: string): string {
+  switch (code) {
+    case 'auth/invalid-email':
+      return 'Please enter a valid email address.'
+    case 'auth/user-disabled':
+      return 'This account has been disabled.'
+    case 'auth/user-not-found':
+      return 'No account found with this email.'
+    case 'auth/wrong-password':
+      return 'Incorrect password. Try again or reset it.'
+    case 'auth/invalid-credential':
+      return 'Invalid email or password.'
+    case 'auth/email-already-in-use':
+      return 'An account with this email already exists. Sign in instead.'
+    case 'auth/weak-password':
+      return 'Password is too weak. Use at least 8 characters.'
+    case 'auth/too-many-requests':
+      return 'Too many attempts. Please wait a moment and try again.'
+    case 'auth/network-request-failed':
+      return 'Network error. Check your connection and try again.'
+    default:
+      return ''
+  }
+}
 
 export function SignInDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
   const [mode, setMode] = useState<Mode>('signin')
@@ -25,28 +56,27 @@ export function SignInDialog({ open, onOpenChange }: { open: boolean; onOpenChan
     event.preventDefault()
     setMessage('')
     setError('')
-    if (!supabase) {
-      setError('Add your Supabase URL and anon key to enable accounts.')
+    if (!auth) {
+      setError('Add your Firebase configuration to enable accounts.')
       return
     }
     setBusy(true)
     try {
       if (mode === 'signin') {
-        const { error: authError } = await supabase.auth.signInWithPassword({ email, password })
-        if (authError) throw authError
+        await signInWithEmailAndPassword(auth, email, password)
         onOpenChange(false)
       } else if (mode === 'signup') {
-        const { data, error: authError } = await supabase.auth.signUp({ email, password, options: { emailRedirectTo: window.location.origin } })
-        if (authError) throw authError
-        if (data.session) onOpenChange(false)
-        else setMessage('Check your inbox to verify your email and finish creating your account.')
+        const credential = await createUserWithEmailAndPassword(auth, email, password)
+        await sendEmailVerification(credential.user).catch(() => undefined)
+        setMessage('Check your inbox to verify your email and finish creating your account.')
       } else {
-        const { error: authError } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: `${window.location.origin}/settings` })
-        if (authError) throw authError
+        await sendPasswordResetEmail(auth, email)
         setMessage('If an account matches that email, a reset link is on its way.')
       }
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : 'Sign-in failed. Please try again.')
+      const firebaseError = cause as { code?: string; message?: string }
+      const friendlyMessage = firebaseErrorMessage(firebaseError.code)
+      setError(friendlyMessage || firebaseError.message || 'Sign-in failed. Please try again.')
     } finally {
       setBusy(false)
     }
@@ -64,7 +94,7 @@ export function SignInDialog({ open, onOpenChange }: { open: boolean; onOpenChan
             <div>
               <Dialog.Title className="text-2xl font-bold tracking-tight text-ink">{title}</Dialog.Title>
               <Dialog.Description className="mt-2 text-sm leading-6 text-muted">
-                {mode === 'signin' ? 'Pick up where you left off.' : mode === 'signup' ? 'Save your place and build a library of your own.' : 'We’ll send a secure reset link to your email.'}
+                {mode === 'signin' ? 'Pick up where you left off.' : mode === 'signup' ? 'Save your place and build a library of your own.' : "We'll send a secure reset link to your email."}
               </Dialog.Description>
             </div>
             <Dialog.Close asChild><IconButton aria-label="Close sign in dialog" variant="ghost" className="-mr-2 -mt-2"><X className="size-4" /></IconButton></Dialog.Close>

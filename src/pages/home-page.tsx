@@ -5,7 +5,7 @@ import { VideoCard } from '../components/video/video-card'
 import { EmptyState, ErrorState, VideoGridSkeleton } from '../components/ui/content-state'
 import { Badge } from '../components/ui/badge'
 import { Button } from '../components/ui/button'
-import { isSupabaseConfigured } from '../lib/supabase'
+import { isFirebaseConfigured } from '../lib/firebase'
 import { fetchCatalog, fetchCategories, fetchContinueWatching, formatDuration, formatViews } from '../services/videos'
 import { previewFeatured } from '../data/preview-videos'
 import type { Category, Video } from '../types/video'
@@ -26,8 +26,8 @@ export function HomePage() {
   const [continueWatching, setContinueWatching] = useState<ContinueItem[]>([])
   const [categories, setCategories] = useState<Category[]>([])
   const [selectedCategory, setSelectedCategory] = useState('all')
-  const [featured, setFeatured] = useState<Video | null>(isSupabaseConfigured ? null : previewFeatured)
-  const [preview, setPreview] = useState(!isSupabaseConfigured)
+  const [featured, setFeatured] = useState<Video | null>(isFirebaseConfigured ? null : previewFeatured)
+  const [preview, setPreview] = useState(!isFirebaseConfigured)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const navigate = useNavigate()
@@ -64,7 +64,7 @@ export function HomePage() {
   }, [load])
 
   return <div className="animate-fade-up space-y-9 sm:space-y-11">
-    {preview && <div role="status" className="flex flex-wrap items-center gap-x-2 gap-y-1 rounded-2xl border border-brand/20 bg-brand/[0.06] px-4 py-2.5 text-[11px] leading-5 text-muted"><Sparkles className="size-3.5 shrink-0 text-brand" /><span><strong className="font-bold text-ink">Preview mode.</strong> Sample titles and counts are illustrative; configure Supabase to browse live catalog data.</span></div>}
+    {preview && <div role="status" className="flex flex-wrap items-center gap-x-2 gap-y-1 rounded-2xl border border-brand/20 bg-brand/[0.06] px-4 py-2.5 text-[11px] leading-5 text-muted"><Sparkles className="size-3.5 shrink-0 text-brand" /><span><strong className="font-bold text-ink">Preview mode.</strong> Sample titles and counts are illustrative; configure Firebase to browse live catalog data.</span></div>}
 
     {error ? <ErrorState message={error} onRetry={() => void load()} /> : <>
       {featured ? <section aria-label="Featured video" className="relative isolate min-h-[360px] overflow-hidden rounded-[30px] border border-line/50 bg-raised shadow-soft sm:min-h-[400px] lg:min-h-[440px]">

@@ -20,7 +20,7 @@ export function AppShell() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
   const [authOpen, setAuthOpen] = useState(false)
-  const displayName = String(user?.user_metadata.display_name || user?.email || 'Your account')
+  const displayName = String(user?.displayName || user?.email || 'Your account')
 
   return <div className="min-h-screen bg-canvas text-ink lg:flex">
     <a href="#main-content" className="sr-only fixed left-4 top-4 z-[90] rounded-xl bg-brand px-4 py-2 text-sm font-bold text-brand-foreground focus:not-sr-only">Skip to content</a>

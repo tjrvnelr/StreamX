@@ -5,7 +5,7 @@ import { VideoCard } from '../components/video/video-card'
 import { EmptyState, ErrorState, VideoGridSkeleton } from '../components/ui/content-state'
 import { Button } from '../components/ui/button'
 import { fetchCatalog, fetchCategories } from '../services/videos'
-import { isSupabaseConfigured } from '../lib/supabase'
+import { isFirebaseConfigured } from '../lib/firebase'
 import type { Category, Video, VideoSort } from '../types/video'
 
 type Mode = 'explore' | 'search' | 'trending'
@@ -17,7 +17,7 @@ export function DiscoveryPage({ mode }: { mode: Mode }) {
   const sort = (params.get('sort') as VideoSort | null) || (mode === 'trending' ? 'popular' : mode === 'explore' ? 'newest' : 'relevance')
   const [videos, setVideos] = useState<Video[]>([])
   const [categories, setCategories] = useState<Category[]>([])
-  const [preview, setPreview] = useState(!isSupabaseConfigured)
+  const [preview, setPreview] = useState(!isFirebaseConfigured)
   const [loading, setLoading] = useState(true)
   const [hasMore, setHasMore] = useState(false)
   const [page, setPage] = useState(0)
@@ -60,7 +60,7 @@ export function DiscoveryPage({ mode }: { mode: Mode }) {
       <label className="flex min-w-44 items-center gap-2.5 rounded-2xl border border-line/70 bg-surface px-3.5 shadow-inset-sm" htmlFor="sort-videos"><ArrowDownWideNarrow className="size-4 shrink-0 text-dim" /><span className="sr-only">Sort videos</span><select id="sort-videos" value={sort} onChange={(event) => setFilter('sort', event.target.value)} className="h-11 min-w-0 flex-1 appearance-none bg-transparent text-xs font-semibold text-ink outline-none"><option value="relevance">Relevance</option><option value="newest">Newest</option><option value="popular">Most viewed</option></select></label>
     </header>
 
-    {preview && <div role="status" className="flex items-center gap-2 rounded-xl border border-brand/20 bg-brand/[0.06] px-3.5 py-2.5 text-[11px] text-muted"><Sparkles className="size-3.5 text-brand" /><span><strong className="text-ink">Preview data.</strong> Catalog counts are illustrative until Supabase is configured.</span></div>}
+    {preview && <div role="status" className="flex items-center gap-2 rounded-xl border border-brand/20 bg-brand/[0.06] px-3.5 py-2.5 text-[11px] text-muted"><Sparkles className="size-3.5 text-brand" /><span><strong className="text-ink">Preview data.</strong> Catalog counts are illustrative until Firebase is configured.</span></div>}
 
     {mode === 'search' && query && <div className="flex items-center gap-2.5 rounded-2xl bg-raised/70 px-4 py-3 text-xs text-muted"><Search className="size-4 text-brand" /><span>Searching titles, descriptions, creators, categories, and tags</span></div>}
 

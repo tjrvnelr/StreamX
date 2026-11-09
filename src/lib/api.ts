@@ -1,4 +1,4 @@
-import { supabase } from './supabase'
+import { auth } from './firebase'
 
 export function normalizeApiBase(value?: string) {
   const base = String(value || '/api').trim().replace(/\/+$/, '')
@@ -33,20 +33,14 @@ export class ApiError extends Error {
 }
 
 async function getAccessToken() {
-  if (!supabase) return undefined
-  const { data, error } = await supabase.auth.getSession()
-  if (error) throw new ApiError('Your sign-in session could not be read. Sign in again.', 401)
-  let session = data.session
-  if (!session) return undefined
-
-  if (session.expires_at && session.expires_at <= Math.floor(Date.now() / 1000) + 30) {
-    const refreshed = await supabase.auth.refreshSession()
-    if (refreshed.error || !refreshed.data.session) {
-      throw new ApiError('Your sign-in session could not be refreshed. Sign in again.', 401)
-    }
-    session = refreshed.data.session
+  if (!auth) return undefined
+  const user = auth.currentUser
+  if (!user) return undefined
+  try {
+    return await user.getIdToken()
+  } catch {
+    throw new ApiError('Your sign-in session could not be read. Sign in again.', 401)
   }
-  return session.access_token
 }
 
 export async function apiRequest<T>(path: string, init: RequestInit = {}): Promise<T> {

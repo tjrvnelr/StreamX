@@ -9,7 +9,7 @@ import { Badge } from '../components/ui/badge'
 import { EmptyState, ErrorState, LoadingState } from '../components/ui/content-state'
 import { useToast } from '../components/ui/toast-context'
 import { ApiError } from '../lib/api'
-import { isSupabaseConfigured } from '../lib/supabase'
+import { isFirebaseConfigured } from '../lib/firebase'
 import { fetchCatalog, fetchProgress, fetchVideo, formatAge, formatViews, getPlaybackUrl, isSaved, recordView, saveProgress, toggleSaved } from '../services/videos'
 import type { Video } from '../types/video'
 
@@ -98,7 +98,7 @@ export function WatchPage() {
   }, [load])
 
   const handleTime = useCallback((current: number, duration: number) => {
-    if (!video || video.isPreview || !isSupabaseConfigured || current < 2) return
+    if (!video || video.isPreview || !isFirebaseConfigured || current < 2) return
     if (current - lastWriteAt.current >= 15) {
       lastWriteAt.current = current
       void saveProgress(video.id, current, duration).catch(() => undefined)
@@ -106,7 +106,7 @@ export function WatchPage() {
   }, [video])
 
   const persistProgress = useCallback((current: number, duration: number) => {
-    if (!video || video.isPreview || !isSupabaseConfigured || current < 2) return
+    if (!video || video.isPreview || !isFirebaseConfigured || current < 2) return
     lastWriteAt.current = current
     void saveProgress(video.id, current, duration).catch((cause: unknown) => toast(cause instanceof Error ? cause.message : 'Progress could not be saved.', 'error'))
   }, [video, toast])
