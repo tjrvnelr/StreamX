@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "658536423926",
+    "project_id": "streamx-ad9da",
+    "storage_bucket": "streamx-ad9da.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:658536423926:android:a51cd4ff9dfc673fd927d7",
+        "android_client_info": {
+          "package_name": "com.example.mobile_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDAXroNWwdACqozWB1I10hhdo2jyUECkOs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:658536423926:android:72ee01c0d4ee45aed927d7",
+        "android_client_info": {
+          "package_name": "com.example.streamx_flutter"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDAXroNWwdACqozWB1I10hhdo2jyUECkOs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
