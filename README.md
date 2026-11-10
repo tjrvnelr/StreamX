@@ -3,6 +3,7 @@
 StreamX is a self-hostable video library and streaming application for browsing, uploading, organizing, and watching personal media.
 
 **Live:** [stream-x-six-xi.vercel.app](https://stream-x-six-xi.vercel.app/)
+**StreamX Mobile App** https://github.com/tjrvnelr/StreamX/releases
 
 ## Features
 
