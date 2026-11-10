@@ -15,13 +15,15 @@ StreamX is a self-hostable video library and streaming application for browsing,
 - Video uploads with single-part and multipart upload support
 - Thumbnail uploads and signed playback URLs
 - Responsive React interface
+- Flutter Android app with a preview catalog
 - Cloudflare R2 object storage integration
 
 ## Technology stack
 
 The current implementation is not a conventional MongoDB-based MERN application. It uses:
 
-- **Frontend:** React, TypeScript, Vite, Tailwind CSS
+- **Web app (`web-app/`):** React, TypeScript, Vite, Tailwind CSS
+- **Android app:** Flutter and Dart
 - **API:** Node.js, Express, TypeScript
 - **Authentication and database:** Firebase Authentication and Cloud Firestore
 - **Video storage:** Cloudflare R2 through the S3-compatible API
@@ -40,7 +42,8 @@ The current implementation is not a conventional MongoDB-based MERN application.
 
 StreamX currently focuses on private or self-hosted video libraries. The project does not provide:
 
-- Native iOS or Android applications
+- Native iOS applications
+- A live catalog, authentication, and uploads in the preview-only Android app
 - Live television broadcasting
 - Original content production
 - Payments or subscriptions

@@ -15,7 +15,7 @@ export default defineConfig({
     { name: 'mobile-chromium', use: { ...devices['iPhone 13'], browserName: 'chromium' } },
   ],
   webServer: {
-    command: 'npm.cmd run dev -- --host 127.0.0.1',
+    command: 'npm.cmd run dev:frontend -- --host 127.0.0.1',
     url: 'http://127.0.0.1:5173',
     env: {
       STREAMX_E2E_PREVIEW: 'true',

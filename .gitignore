@@ -17,6 +17,10 @@ dist-ssr
 !.env.example
 uploads
 
+# Playwright output
+test-results/
+playwright-report/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
