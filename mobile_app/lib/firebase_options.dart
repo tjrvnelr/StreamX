@@ -56,7 +56,6 @@ class DefaultFirebaseOptions {
     projectId: 'streamx-ad9da',
     storageBucket: 'streamx-ad9da.firebasestorage.app',
   );
-
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyAjn97YJTjc2qrPwC2nMlRSegGbiUjJbmI',
     appId: '1:658536423926:ios:08fefc468c11b817d927d7',
