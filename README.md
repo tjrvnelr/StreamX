@@ -3,7 +3,7 @@
 StreamX is a self-hostable video library and streaming application for browsing, uploading, organizing, and watching personal media.
 
 - **Live:** [stream-x-six-xi.vercel.app](https://stream-x-six-xi.vercel.app/)
-- **StreamX Mobile App** https://github.com/tjrvnelr/StreamX/releases
+- **StreamX Mobile App:** https://github.com/tjrvnelr/StreamX/releases
 
 ## Features
 
@@ -15,7 +15,7 @@ StreamX is a self-hostable video library and streaming application for browsing,
 - Video uploads with single-part and multipart upload support
 - Thumbnail uploads and signed playback URLs
 - Responsive React interface
-- Flutter Android app with a preview catalog
+- Flutter Android app with a Firebase-backed catalog and signed video playback
 - Cloudflare R2 object storage integration
 
 ## Technology stack
@@ -43,7 +43,7 @@ The current implementation is not a conventional MongoDB-based MERN application.
 StreamX currently focuses on private or self-hosted video libraries. The project does not provide:
 
 - Native iOS applications
-- A live catalog, authentication, and uploads in the preview-only Android app
+- Native sign-in, account-synced library, and video uploads in the Android app
 - Live television broadcasting
 - Original content production
 - Payments or subscriptions

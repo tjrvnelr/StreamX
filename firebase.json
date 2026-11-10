@@ -6,6 +6,8 @@
     "indexes": "firestore.indexes.json"
   },
   "auth": {
-    "providers": {}
+    "providers": {
+      "emailPassword": true
+    }
   }
 }

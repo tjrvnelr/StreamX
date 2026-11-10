@@ -33,6 +33,9 @@ function firebaseErrorMessage(code?: string): string {
       return 'Too many attempts. Please wait a moment and try again.'
     case 'auth/network-request-failed':
       return 'Network error. Check your connection and try again.'
+    case 'auth/configuration-not-found':
+    case 'auth/operation-not-allowed':
+      return 'Email and password sign-in is not enabled for this Firebase project yet.'
     default:
       return ''
   }
