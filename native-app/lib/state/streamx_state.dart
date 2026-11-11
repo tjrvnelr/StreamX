@@ -33,8 +33,13 @@ class StreamXState extends ChangeNotifier {
   final Map<String, int> _progressSeconds = <String, int>{};
   final List<StreamXPlaylist> _playlists = <StreamXPlaylist>[];
   final List<StreamXVideo> _liveVideos = <StreamXVideo>[];
-  List<StreamXCategory> _categories = previewCategories;
-  bool _previewMode = true;
+  static const _allCategory = StreamXCategory(name: 'All', slug: 'all');
+  List<StreamXCategory> _categories = kDebugMode
+      ? previewCategories
+      : const [_allCategory];
+  bool _previewMode = kDebugMode;
+  bool catalogLoading = true;
+  String? catalogError;
   bool _disposed = false;
   int _nextPlaylistId = 1;
 
@@ -46,6 +51,10 @@ class StreamXState extends ChangeNotifier {
       _previewMode ? previewVideos : _liveVideos;
 
   Future<void> refreshCatalog() async {
+    catalogLoading = true;
+    catalogError = null;
+    _notifyIfActive();
+
     try {
       final snapshot = await FirebaseFirestore.instance
           .collection('videos')
@@ -72,11 +81,18 @@ class StreamXState extends ChangeNotifier {
         selectedCategory = 'all';
       }
       _previewMode = false;
-      _notifyIfActive();
+      catalogError = null;
       unawaited(_refreshThumbnails(videos));
-    } catch (_) {
-      _previewMode = true;
-      _categories = previewCategories;
+    } catch (error) {
+      debugPrint('StreamX live catalog could not be loaded: $error');
+      _previewMode = kDebugMode;
+      _categories = kDebugMode ? previewCategories : const [_allCategory];
+      catalogError = error is FirebaseException &&
+              error.code == 'permission-denied'
+          ? 'StreamX cannot read the live video catalog. Check the Firestore read rules.'
+          : 'StreamX could not load the live video catalog. Check your connection and retry.';
+    } finally {
+      catalogLoading = false;
       _notifyIfActive();
     }
   }

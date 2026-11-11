@@ -6,6 +6,7 @@ import {
   createUserWithEmailAndPassword,
   sendPasswordResetEmail,
   sendEmailVerification,
+  signOut,
 } from 'firebase/auth'
 import { auth } from '../../lib/firebase'
 import { Button, IconButton } from '../ui/button'
@@ -66,12 +67,21 @@ export function SignInDialog({ open, onOpenChange }: { open: boolean; onOpenChan
     setBusy(true)
     try {
       if (mode === 'signin') {
-        await signInWithEmailAndPassword(auth, email, password)
+        const credential = await signInWithEmailAndPassword(auth, email, password)
+        if (!credential.user.emailVerified) {
+          try {
+            await sendEmailVerification(credential.user)
+          } finally {
+            await signOut(auth)
+          }
+          setMessage(`Your email is not verified yet. We sent a new verification link to ${credential.user.email || email}.`)
+          return
+        }
         onOpenChange(false)
       } else if (mode === 'signup') {
         const credential = await createUserWithEmailAndPassword(auth, email, password)
-        await sendEmailVerification(credential.user).catch(() => undefined)
-        setMessage('Check your inbox to verify your email and finish creating your account.')
+        await sendEmailVerification(credential.user)
+        setMessage(`We sent a verification link to ${credential.user.email || email}. Open it, then sign in to upload videos.`)
       } else {
         await sendPasswordResetEmail(auth, email)
         setMessage('If an account matches that email, a reset link is on its way.')

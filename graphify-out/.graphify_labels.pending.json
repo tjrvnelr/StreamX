@@ -1,11 +1,11 @@
 {
-  "0": "upload-page.tsx",
+  "0": "videos.ts",
   "1": "index.js",
   "2": "streamx_state.dart",
   "3": "index.ts",
   "4": "watch_screen.dart",
   "5": "package.json",
-  "6": "preview-videos.ts",
+  "6": "App.tsx",
   "7": "UploadPage",
   "8": "streamx_theme.dart",
   "9": "devDependencies",
@@ -30,7 +30,7 @@
   "28": "firebase_options.dart",
   "29": "FlutterWindow",
   "30": "video_card.dart",
-  "31": "@vitejs/plugin-react",
+  "31": "upload-page.tsx",
   "32": "StreamX",
   "33": "package:flutter/material.dart",
   "34": "FlutterActivity",
@@ -53,5 +53,9 @@
   "51": "app/build.gradle.kts",
   "52": "android/build.gradle.kts",
   "53": "settings.gradle.kts",
-  "54": "String?"
+  "54": "String?",
+  "55": "dashboard-page.tsx",
+  "56": "library-page.tsx",
+  "57": "edit-video-dialog.tsx",
+  "58": "@playwright/test"
 }

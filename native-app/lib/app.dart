@@ -99,17 +99,57 @@ class StreamXShell extends StatelessWidget {
             const SizedBox(width: 6),
           ],
         ),
-        body: IndexedStack(
-          index: state.currentTab,
+        body: Column(
           children: [
-            HomeScreen(state: state),
-            ExploreScreen(state: state, searchFocusNode: searchFocusNode),
-            LibraryScreen(state: state),
-            UploadScreen(state: state),
-            AccountScreen(
-              onToggleTheme: onToggleTheme,
-              themeMode: themeMode,
-              state: state,
+            if (state.catalogLoading || state.catalogError != null)
+              Material(
+                color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 10,
+                  ),
+                  child: Row(
+                    children: [
+                      if (state.catalogLoading) ...[
+                        const SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                        const SizedBox(width: 12),
+                      ],
+                      Expanded(
+                        child: Text(
+                          state.catalogError ?? 'Loading live videos…',
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
+                      ),
+                      if (state.catalogError != null)
+                        TextButton.icon(
+                          onPressed: state.refreshCatalog,
+                          icon: const Icon(Icons.refresh_rounded, size: 18),
+                          label: const Text('Retry'),
+                        ),
+                    ],
+                  ),
+                ),
+              ),
+            Expanded(
+              child: IndexedStack(
+                index: state.currentTab,
+                children: [
+                  HomeScreen(state: state),
+                  ExploreScreen(state: state, searchFocusNode: searchFocusNode),
+                  LibraryScreen(state: state),
+                  UploadScreen(state: state),
+                  AccountScreen(
+                    onToggleTheme: onToggleTheme,
+                    themeMode: themeMode,
+                    state: state,
+                  ),
+                ],
+              ),
             ),
           ],
         ),

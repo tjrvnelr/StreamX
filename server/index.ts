@@ -123,6 +123,12 @@ function requireAuth(req: Request, res: Response, next: NextFunction) {
   void authenticate(req, res).then((ok) => { if (ok) next() }).catch(() => errorResponse(res, 401, 'Your session could not be verified.'))
 }
 
+function requireVerifiedAuth(req: Request, res: Response, next: NextFunction) {
+  if (!req.authUser) return errorResponse(res, 401, 'Sign in to continue.')
+  if (!req.authUser.emailConfirmed) return errorResponse(res, 403, 'Verify your email address before uploading.')
+  next()
+}
+
 function optionalAuth(req: Request, res: Response, next: NextFunction) {
   void authenticate(req, res, true).then((ok) => { if (ok) next() }).catch(() => errorResponse(res, 401, 'Your session could not be verified.'))
 }
@@ -167,7 +173,7 @@ async function ownVideo(videoId: string, userId: string) {
 
 app.get('/api/health', (_req, res) => res.json({ ok: true, service: 'streamx-api' }))
 
-app.post('/api/uploads', uploadLimiter, requireAuth, async (req, res) => {
+app.post('/api/uploads', uploadLimiter, requireAuth, requireVerifiedAuth, async (req, res) => {
   const parsed = uploadSchema.safeParse(req.body)
   if (!parsed.success) return errorResponse(res, 400, 'Review the upload details and try again.')
   const user = req.authUser!
@@ -262,7 +268,7 @@ app.post('/api/uploads', uploadLimiter, requireAuth, async (req, res) => {
   }
 })
 
-app.post('/api/uploads/:videoId/parts', partUrlLimiter, requireAuth, async (req, res) => {
+app.post('/api/uploads/:videoId/parts', partUrlLimiter, requireAuth, requireVerifiedAuth, async (req, res) => {
   const videoId = idSchema.safeParse(req.params.videoId)
   const input = partUrlsSchema.safeParse(req.body)
   if (!videoId.success || !input.success) return errorResponse(res, 400, 'Invalid multipart upload request.')
@@ -283,7 +289,7 @@ app.post('/api/uploads/:videoId/parts', partUrlLimiter, requireAuth, async (req,
   }
 })
 
-app.post('/api/uploads/:videoId/url', partUrlLimiter, requireAuth, async (req, res) => {
+app.post('/api/uploads/:videoId/url', partUrlLimiter, requireAuth, requireVerifiedAuth, async (req, res) => {
   const videoId = idSchema.safeParse(req.params.videoId)
   if (!videoId.success) return errorResponse(res, 400, 'Invalid upload identifier.')
   const [session, video] = await Promise.all([
@@ -301,7 +307,7 @@ app.post('/api/uploads/:videoId/url', partUrlLimiter, requireAuth, async (req, r
   }
 })
 
-app.post('/api/uploads/:videoId/complete', uploadLimiter, requireAuth, async (req, res) => {
+app.post('/api/uploads/:videoId/complete', uploadLimiter, requireAuth, requireVerifiedAuth, async (req, res) => {
   const videoId = idSchema.safeParse(req.params.videoId)
   const input = completeSchema.safeParse(req.body)
   if (!videoId.success || !input.success) return errorResponse(res, 400, 'Invalid upload completion request.')
@@ -338,7 +344,7 @@ app.post('/api/uploads/:videoId/complete', uploadLimiter, requireAuth, async (re
   }
 })
 
-app.post('/api/uploads/:videoId/thumbnail', uploadLimiter, requireAuth, async (req, res) => {
+app.post('/api/uploads/:videoId/thumbnail', uploadLimiter, requireAuth, requireVerifiedAuth, async (req, res) => {
   const videoId = idSchema.safeParse(req.params.videoId)
   const input = thumbnailSchema.safeParse(req.body)
   if (!videoId.success || !input.success) return errorResponse(res, 400, 'Choose a JPG, PNG, WebP, or AVIF image under 10 MB.')
@@ -357,7 +363,7 @@ app.post('/api/uploads/:videoId/thumbnail', uploadLimiter, requireAuth, async (r
   }
 })
 
-app.post('/api/uploads/:videoId/abort', uploadLimiter, requireAuth, async (req, res) => {
+app.post('/api/uploads/:videoId/abort', uploadLimiter, requireAuth, requireVerifiedAuth, async (req, res) => {
   const videoId = idSchema.safeParse(req.params.videoId)
   if (!videoId.success) return errorResponse(res, 400, 'Invalid upload identifier.')
   const [session, video] = await Promise.all([
@@ -438,7 +444,7 @@ app.post('/api/videos/:videoId/view', playbackLimiter, optionalAuth, async (req,
   }
 })
 
-app.post('/api/videos/:videoId/visibility', uploadLimiter, requireAuth, async (req, res) => {
+app.post('/api/videos/:videoId/visibility', uploadLimiter, requireAuth, requireVerifiedAuth, async (req, res) => {
   const videoId = idSchema.safeParse(req.params.videoId)
   const input = visibilitySchema.safeParse(req.body)
   if (!videoId.success || !input.success) return errorResponse(res, 400, 'Choose a valid visibility setting.')
@@ -453,7 +459,7 @@ app.post('/api/videos/:videoId/visibility', uploadLimiter, requireAuth, async (r
   }
 })
 
-app.delete('/api/videos/:videoId', uploadLimiter, requireAuth, async (req, res) => {
+app.delete('/api/videos/:videoId', uploadLimiter, requireAuth, requireVerifiedAuth, async (req, res) => {
   const videoId = idSchema.safeParse(req.params.videoId)
   if (!videoId.success) return errorResponse(res, 400, 'Invalid video identifier.')
   const video = await ownVideo(videoId.data, req.authUser!.id)
