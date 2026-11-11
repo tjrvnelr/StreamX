@@ -1,7 +1,7 @@
 # Graph Report - StreamX  (2026-11-12)
 
 ## Corpus Check
-- 101 files · ~40,886 words
+- 101 files · ~41,031 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 23 file(s) not represented in the graph (top: .xml 7, (none) 6, .properties 2)
 
@@ -11,7 +11,7 @@
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `56445c9c`
+- Built from commit: `f97c07ec`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -84,14 +84,14 @@
 ## Surprising Connections (you probably didn't know these)
 - `wWinMain()` --calls--> `CreateAndAttachConsole()`  [INFERRED]
   native-app/windows/runner/main.cpp → native-app/windows/runner/utils.cpp
-- `DashboardPage()` --calls--> `useAuth()`  [EXTRACTED]
-  web-app/src/pages/dashboard-page.tsx → web-app/src/components/auth/auth-context.ts
-- `LibraryPage()` --calls--> `useAuth()`  [EXTRACTED]
-  web-app/src/pages/library-page.tsx → web-app/src/components/auth/auth-context.ts
-- `SettingsPage()` --calls--> `useAuth()`  [EXTRACTED]
-  web-app/src/pages/settings-page.tsx → web-app/src/components/auth/auth-context.ts
-- `UploadPage()` --calls--> `useAuth()`  [EXTRACTED]
-  web-app/src/pages/upload-page.tsx → web-app/src/components/auth/auth-context.ts
+- `cancelUpload()` --calls--> `apiRequest()`  [EXTRACTED]
+  web-app/src/pages/upload-page.tsx → web-app/src/lib/api.ts
+- `deleteVideo()` --calls--> `apiRequest()`  [EXTRACTED]
+  web-app/src/services/videos.ts → web-app/src/lib/api.ts
+- `getPlaybackUrl()` --calls--> `apiRequest()`  [EXTRACTED]
+  web-app/src/services/videos.ts → web-app/src/lib/api.ts
+- `recordView()` --calls--> `apiRequest()`  [EXTRACTED]
+  web-app/src/services/videos.ts → web-app/src/lib/api.ts
 
 ## Import Cycles
 - None detected.
@@ -224,7 +224,7 @@ Nodes (18): firebase, react, AuthContext, AuthContextValue, Mode, Input, auth, d
 
 ### Community 32 - "StreamX"
 Cohesion: 0.33
-Nodes (5): Features, Prerequisites, Scope and limitations, StreamX, Technology stack
+Nodes (5): Features, Project Structure, Scope and Limitations, StreamX, Technology Stack
 
 ### Community 35 - ".Create"
 Cohesion: 0.16
@@ -271,7 +271,7 @@ Cohesion: 0.18
 Nodes (16): @radix-ui/react-dialog, Textarea, ToastContextValue, useToast(), AddToPlaylistDialog(), add(), submitCreate(), EditVideoDialog() (+8 more)
 
 ## Knowledge Gaps
-- **241 isolated node(s):** `_streamXState`, `_searchFocusNode`, `_themeMode`, `state`, `onToggleTheme` (+236 more)
+- **241 isolated node(s):** `category`, `copyWith`, `createdAt`, `creator`, `days` (+236 more)
   These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 511 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
 - **16 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
@@ -280,7 +280,7 @@ _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `react` connect `upload-page.tsx` to `videos.ts`, `package.json`, `App.tsx`, `package.json`, `VideoPlayer`, `dashboard-page.tsx`, `library-page.tsx`, `edit-video-dialog.tsx`, `App.tsx`?**
   _High betweenness centrality (0.031) - this node is a cross-community bridge._
-- **What connects `_streamXState`, `_searchFocusNode`, `_themeMode` to the rest of the system?**
+- **What connects `category`, `copyWith`, `createdAt` to the rest of the system?**
   _241 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `videos.ts` be split into smaller, more focused modules?**
   _Cohesion score 0.1422475106685633 - nodes in this community are weakly interconnected._

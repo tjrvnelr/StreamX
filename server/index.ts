@@ -111,10 +111,17 @@ async function authenticate(req: Request, res: Response, optional = false) {
     }
     return true
   } catch (cause) {
+    const code = typeof cause === 'object' && cause !== null && 'code' in cause && typeof cause.code === 'string'
+      ? cause.code
+      : undefined
     console.warn('[auth] Firebase ID token verification failed', {
       name: cause instanceof Error ? cause.name : 'UnknownError',
+      code,
     })
-    errorResponse(res, 401, 'Your session has expired. Sign in again.')
+    const message = code === 'auth/id-token-expired'
+      ? 'Your sign-in session expired. Refresh the page and sign in again.'
+      : 'We could not verify your sign-in. Refresh the page and sign in again. If this continues, check that the frontend and API use the same Firebase project.'
+    errorResponse(res, 401, message)
     return false
   }
 }

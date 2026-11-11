@@ -32,12 +32,12 @@ export class ApiError extends Error {
   }
 }
 
-async function getAccessToken() {
+async function getAccessToken(forceRefresh = false) {
   if (!auth) return undefined
   const user = auth.currentUser
   if (!user) return undefined
   try {
-    return await user.getIdToken()
+    return await user.getIdToken(forceRefresh)
   } catch {
     throw new ApiError('Your sign-in session could not be read. Sign in again.', 401)
   }
@@ -45,16 +45,21 @@ async function getAccessToken() {
 
 export async function apiRequest<T>(path: string, init: RequestInit = {}): Promise<T> {
   if (!apiBase) throw new ApiError('VITE_API_URL is missing from this production build. In Vercel, set it to the separate API service URL ending in /api, then rebuild and redeploy.', 0)
-  const token = await getAccessToken()
-  const headers = new Headers(init.headers)
-  if (token) headers.set('Authorization', `Bearer ${token}`)
-  if (init.body && !(init.body instanceof FormData)) headers.set('Content-Type', 'application/json')
+  const requestUrl = `${apiBase}${path}`
+  const send = async (forceRefresh = false) => {
+    const token = await getAccessToken(forceRefresh)
+    const headers = new Headers(init.headers)
+    if (token) headers.set('Authorization', `Bearer ${token}`)
+    if (init.body && !(init.body instanceof FormData)) headers.set('Content-Type', 'application/json')
+    return fetch(requestUrl, { ...init, headers })
+  }
 
   let response: Response
-  const requestUrl = `${apiBase}${path}`
   try {
-    response = await fetch(requestUrl, { ...init, headers })
-  } catch {
+    response = await send()
+    if (response.status === 401 && auth?.currentUser) response = await send(true)
+  } catch (cause) {
+    if (cause instanceof ApiError || (cause instanceof DOMException && cause.name === 'AbortError')) throw cause
     throw new ApiError('Could not reach the StreamX API. Check VITE_API_URL, confirm the API service is running, and allow this site in the API FRONTEND_ORIGIN setting.', 0)
   }
   const isJson = response.headers.get('content-type')?.toLowerCase().includes('application/json') ?? false
