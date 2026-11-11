@@ -701,6 +701,12 @@
     "ast_hash": "57838d52c318faff743130c3fcfae0c6",
     "semantic_hash": ""
   },
+  "vercel.json": {
+    "mtime": 1794423074.048954,
+    "seen": 1794423355.37553,
+    "ast_hash": "cf6fad1ce721da13630f9f3e7b81fd0c",
+    "semantic_hash": ""
+  },
   "package-lock.json": {
     "mtime": 1794416331.9644287,
     "seen": 1794418978.8697455,
