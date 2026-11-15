@@ -52,3 +52,11 @@ StreamX currently focuses on private or self-hosted video libraries. The project
 - Live television broadcasting.
 - Advanced DRM protection.
 - Offline downloads.
+
+## Production upload configuration
+
+The web app and API must use the same Firebase project. Set the Vercel build variable `VITE_FIREBASE_PROJECT_ID` and the Render API variable `FIREBASE_PROJECT_ID` to that project's ID (the current production browser reports `streamx-ad9da`). In Render, also set `FIREBASE_SERVICE_ACCOUNT_KEY` to the service account JSON from that Firebase project. Keep the JSON value private; do not commit it. The API accepts either the JSON value or a path to a JSON file.
+
+For the current deployment, set Vercel's `VITE_API_URL` to `https://streamx-57z2.onrender.com/api` and Render's `FRONTEND_ORIGIN` to `https://stream-x-six-xi.vercel.app`. After changing Vercel variables, rebuild and redeploy the frontend; after changing Render variables, redeploy the API.
+
+Cloudflare R2 must allow browser uploads from the Vercel site origin. With the API/R2 environment configured locally, run `npm run r2:cors:check` to inspect the bucket rules. If the frontend origin, `PUT` method, `Content-Type` request header, or exposed `ETag` response header is missing, run `npm run r2:cors:apply` to add the upload CORS rule.

@@ -29,16 +29,22 @@ function initFirebaseAdmin() {
   }
 
   let credential
+  let serviceAccountProjectId: string | undefined
   if (env.FIREBASE_SERVICE_ACCOUNT_KEY) {
     const raw = env.FIREBASE_SERVICE_ACCOUNT_KEY.trim()
     try {
+      let serviceAccount: ServiceAccount & { project_id?: string }
       if (raw.startsWith('{')) {
-        credential = cert(JSON.parse(raw) as ServiceAccount)
+        serviceAccount = JSON.parse(raw) as ServiceAccount & { project_id?: string }
       } else if (fs.existsSync(raw)) {
-        credential = cert(JSON.parse(fs.readFileSync(raw, 'utf-8')) as ServiceAccount)
+        serviceAccount = JSON.parse(fs.readFileSync(raw, 'utf-8')) as ServiceAccount & { project_id?: string }
+      } else {
+        throw new Error('The configured service account file does not exist.')
       }
-    } catch (e) {
-      console.warn('[firebase-admin] Failed to parse FIREBASE_SERVICE_ACCOUNT_KEY:', e)
+      serviceAccountProjectId = serviceAccount.projectId || serviceAccount.project_id
+      credential = cert(serviceAccount)
+    } catch {
+      throw new Error('FIREBASE_SERVICE_ACCOUNT_KEY must contain valid service account JSON or a path to a service account JSON file.')
     }
   } else if (env.FIREBASE_CLIENT_EMAIL && env.FIREBASE_PRIVATE_KEY) {
     credential = cert({
@@ -46,16 +52,16 @@ function initFirebaseAdmin() {
       clientEmail: env.FIREBASE_CLIENT_EMAIL,
       privateKey: env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
     })
+  } else if (env.FIREBASE_CLIENT_EMAIL || env.FIREBASE_PRIVATE_KEY) {
+    throw new Error('Set both FIREBASE_CLIENT_EMAIL and FIREBASE_PRIVATE_KEY, or provide FIREBASE_SERVICE_ACCOUNT_KEY.')
   }
 
-  try {
-    const app = initializeApp(credential ? { credential } : {})
-    return { adminAuth: getAuth(app), adminDb: getFirestore(app) }
-  } catch (err) {
-    console.warn('[firebase-admin] Initializing fallback Firebase Admin app:', err)
-    const app = initializeApp()
-    return { adminAuth: getAuth(app), adminDb: getFirestore(app) }
-  }
+  const projectId = env.FIREBASE_PROJECT_ID || serviceAccountProjectId
+  const app = initializeApp({
+    ...(credential ? { credential } : {}),
+    ...(projectId ? { projectId } : {}),
+  })
+  return { adminAuth: getAuth(app), adminDb: getFirestore(app) }
 }
 
 const { adminAuth, adminDb } = initFirebaseAdmin()
@@ -120,7 +126,7 @@ async function authenticate(req: Request, res: Response, optional = false) {
     })
     const message = code === 'auth/id-token-expired'
       ? 'Your sign-in session expired. Refresh the page and sign in again.'
-      : 'We could not verify your sign-in. Refresh the page and sign in again. If this continues, check that the frontend and API use the same Firebase project.'
+      : `The API rejected your Firebase sign-in token. In Render, set FIREBASE_PROJECT_ID to the same project used by the frontend${env.FIREBASE_PROJECT_ID ? ` (${env.FIREBASE_PROJECT_ID})` : ''} and configure FIREBASE_SERVICE_ACCOUNT_KEY with a service account from that project. Then redeploy the API and sign in again.`
     errorResponse(res, 401, message)
     return false
   }
