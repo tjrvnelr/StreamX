@@ -23,6 +23,44 @@ import {
   uploadUrlExpirySeconds,
 } from './services/r2.service.js'
 
+function readServiceAccount(raw: string) {
+  let value = raw.trim().replace(/^\uFEFF/, '')
+  if (value.startsWith('base64:')) {
+    value = Buffer.from(value.slice('base64:'.length).trim(), 'base64').toString('utf8').replace(/^\uFEFF/, '')
+  }
+  if (value.startsWith("'") && value.endsWith("'")) value = value.slice(1, -1).trim()
+  if (fs.existsSync(value)) value = fs.readFileSync(value, 'utf8').replace(/^\uFEFF/, '')
+
+  let account: unknown = JSON.parse(value)
+  if (typeof account === 'string') {
+    const nestedValue = account.trim()
+    account = fs.existsSync(nestedValue)
+      ? JSON.parse(fs.readFileSync(nestedValue, 'utf8').replace(/^\uFEFF/, ''))
+      : JSON.parse(nestedValue)
+  }
+  if (!account || typeof account !== 'object' || Array.isArray(account)) {
+    throw new Error('Service account content must be a JSON object.')
+  }
+
+  const source = account as ServiceAccount & {
+    project_id?: string
+    client_email?: string
+    private_key?: string
+  }
+  const projectId = source.projectId || source.project_id
+  const clientEmail = source.clientEmail || source.client_email
+  const privateKey = source.privateKey || source.private_key
+  if (typeof clientEmail !== 'string' || typeof privateKey !== 'string') {
+    throw new Error('Service account JSON must include client_email and private_key.')
+  }
+
+  return {
+    projectId,
+    clientEmail,
+    privateKey: privateKey.replace(/\\n/g, '\n'),
+  }
+}
+
 function initFirebaseAdmin() {
   if (getApps().length > 0) {
     return { adminAuth: getAuth(), adminDb: getFirestore() }
@@ -31,20 +69,21 @@ function initFirebaseAdmin() {
   let credential
   let serviceAccountProjectId: string | undefined
   if (env.FIREBASE_SERVICE_ACCOUNT_KEY) {
-    const raw = env.FIREBASE_SERVICE_ACCOUNT_KEY.trim()
+    let serviceAccount: ReturnType<typeof readServiceAccount>
     try {
-      let serviceAccount: ServiceAccount & { project_id?: string }
-      if (raw.startsWith('{')) {
-        serviceAccount = JSON.parse(raw) as ServiceAccount & { project_id?: string }
-      } else if (fs.existsSync(raw)) {
-        serviceAccount = JSON.parse(fs.readFileSync(raw, 'utf-8')) as ServiceAccount & { project_id?: string }
-      } else {
-        throw new Error('The configured service account file does not exist.')
-      }
-      serviceAccountProjectId = serviceAccount.projectId || serviceAccount.project_id
-      credential = cert(serviceAccount)
+      serviceAccount = readServiceAccount(env.FIREBASE_SERVICE_ACCOUNT_KEY)
     } catch {
-      throw new Error('FIREBASE_SERVICE_ACCOUNT_KEY must contain valid service account JSON or a path to a service account JSON file.')
+      throw new Error('FIREBASE_SERVICE_ACCOUNT_KEY must be a Firebase Admin service-account JSON object, a path to that JSON file, or base64:<encoded JSON>. Check that it contains client_email and private_key; do not use the Firebase web config or API key.')
+    }
+    serviceAccountProjectId = serviceAccount.projectId
+    try {
+      credential = cert({
+        projectId: serviceAccount.projectId || env.FIREBASE_PROJECT_ID,
+        clientEmail: serviceAccount.clientEmail,
+        privateKey: serviceAccount.privateKey,
+      })
+    } catch {
+      throw new Error('FIREBASE_SERVICE_ACCOUNT_KEY has an invalid private_key. Copy the original service-account JSON from Firebase Console and set it again in Render.')
     }
   } else if (env.FIREBASE_CLIENT_EMAIL && env.FIREBASE_PRIVATE_KEY) {
     credential = cert({

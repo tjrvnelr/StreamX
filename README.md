@@ -55,7 +55,7 @@ StreamX currently focuses on private or self-hosted video libraries. The project
 
 ## Production upload configuration
 
-The web app and API must use the same Firebase project. Set the Vercel build variable `VITE_FIREBASE_PROJECT_ID` and the Render API variable `FIREBASE_PROJECT_ID` to that project's ID (the current production browser reports `streamx-ad9da`). In Render, also set `FIREBASE_SERVICE_ACCOUNT_KEY` to the service account JSON from that Firebase project. Keep the JSON value private; do not commit it. The API accepts either the JSON value or a path to a JSON file.
+The web app and API must use the same Firebase project. Set the Vercel build variable `VITE_FIREBASE_PROJECT_ID` and the Render API variable `FIREBASE_PROJECT_ID` to that project's ID (the current production browser reports `streamx-ad9da`). In Render, also set `FIREBASE_SERVICE_ACCOUNT_KEY` to the service account JSON from that Firebase project. Keep the JSON value private; do not commit it. The API accepts raw JSON, a path to a JSON file, or `base64:` followed by the encoded JSON. The service account JSON must contain `client_email` and `private_key`; Firebase's web config and API key are not service-account credentials.
 
 For the current deployment, set Vercel's `VITE_API_URL` to `https://streamx-57z2.onrender.com/api` and Render's `FRONTEND_ORIGIN` to `https://stream-x-six-xi.vercel.app`. After changing Vercel variables, rebuild and redeploy the frontend; after changing Render variables, redeploy the API.
 

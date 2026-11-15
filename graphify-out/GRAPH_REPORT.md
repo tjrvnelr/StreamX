@@ -1,17 +1,17 @@
 # Graph Report - StreamX  (2026-11-15)
 
 ## Corpus Check
-- 102 files · ~41,281 words
+- 102 files · ~41,452 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 23 file(s) not represented in the graph (top: .xml 7, (none) 6, .properties 2)
 
 ## Summary
-- 991 nodes · 1844 edges · 61 communities (45 shown, 16 thin omitted)
+- 992 nodes · 1846 edges · 63 communities (46 shown, 17 thin omitted)
 - Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 24 edges (avg confidence: 0.85)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `3d56c7b7`
+- Built from commit: `19d0b9c9`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -64,12 +64,14 @@
 - analysis_options.yaml
 - Point
 - StreamX Mobile
-- App.tsx
-- upload-page.tsx
 - lucide-react
+- upload-page.tsx
+- preview-videos.ts
 - watch-page.tsx
 - dashboard-page.tsx
 - @testing-library/react
+- videos.ts
+- @playwright/test
 
 ## God Nodes (most connected - your core abstractions)
 1. `Button` - 34 edges
@@ -88,21 +90,21 @@
   native-app/windows/runner/main.cpp → native-app/windows/runner/utils.cpp
 - `FlutterWindow` --inherits--> `Win32Window`  [EXTRACTED]
   native-app/windows/runner/flutter_window.h → native-app/windows/runner/win32_window.h
-- `SearchBox()` --calls--> `VideoArtwork()`  [EXTRACTED]
-  web-app/src/components/search/search-box.tsx → web-app/src/components/video/video-artwork.tsx
-- `SearchBox()` --calls--> `fetchCatalog()`  [EXTRACTED]
-  web-app/src/components/search/search-box.tsx → web-app/src/services/videos.ts
-- `DashboardPage()` --calls--> `EmptyState()`  [EXTRACTED]
-  web-app/src/pages/dashboard-page.tsx → web-app/src/components/ui/content-state.tsx
+- `EditVideoDialog()` --calls--> `useToast()`  [EXTRACTED]
+  web-app/src/components/video/edit-video-dialog.tsx → web-app/src/components/ui/toast-context.ts
+- `VideoCard()` --calls--> `useToast()`  [EXTRACTED]
+  web-app/src/components/video/video-card.tsx → web-app/src/components/ui/toast-context.ts
+- `DashboardPage()` --calls--> `useToast()`  [EXTRACTED]
+  web-app/src/pages/dashboard-page.tsx → web-app/src/components/ui/toast-context.ts
 
 ## Import Cycles
 - None detected.
 
-## Communities (61 total, 16 thin omitted)
+## Communities (63 total, 17 thin omitted)
 
 ### Community 0 - "videos.ts"
-Cohesion: 0.15
-Nodes (31): @radix-ui/react-dialog, useToast(), AddToPlaylistDialog(), add(), submitCreate(), LibraryPage(), makePlaylist(), removeItem() (+23 more)
+Cohesion: 0.16
+Nodes (21): @radix-ui/react-dialog, useToast(), AddToPlaylistDialog(), add(), submitCreate(), LibraryPage(), makePlaylist(), removeItem() (+13 more)
 
 ### Community 1 - "index.js"
 Cohesion: 0.07
@@ -114,31 +116,31 @@ Nodes (59): addToPlaylist, _allCategory, catalogError, catalogLoading, _catalogV
 
 ### Community 3 - "index.ts"
 Cohesion: 0.06
-Nodes (39): allowedOrigins, env, parsed, r2Endpoint, schema, { adminAuth, adminDb }, app, authenticate() (+31 more)
+Nodes (41): allowedOrigins, env, parsed, r2Endpoint, schema, { adminAuth, adminDb }, app, authenticate() (+33 more)
 
 ### Community 4 - "watch_screen.dart"
 Cohesion: 0.06
 Nodes (29): brand, build, _controller, _copyVideoTitle, createState, _descriptionExpanded, dispose, _error (+21 more)
 
 ### Community 5 - "package.json"
-Cohesion: 0.07
-Nodes (28): dependencies, @aws-sdk/s3-request-presigner@^3.1000.0, class-variance-authority@^0.7.1, clsx@^2.1.1, cors@^2.8.5, express@^5.1.0, express-rate-limit@^8.0.0, firebase@^13.2.0 (+20 more)
+Cohesion: 0.08
+Nodes (26): dependencies, @aws-sdk/s3-request-presigner@^3.1000.0, class-variance-authority@^0.7.1, clsx@^2.1.1, cors@^2.8.5, express@^5.1.0, express-rate-limit@^8.0.0, firebase@^13.2.0 (+18 more)
 
 ### Community 6 - "react"
-Cohesion: 0.13
-Nodes (20): firebase, react, AuthContext, AuthContextValue, AuthProvider(), Mode, Theme, ThemeContext (+12 more)
+Cohesion: 0.08
+Nodes (35): firebase, react, App(), DashboardPage, DiscoveryPage, HomePage, LibraryPage, NotFoundPage() (+27 more)
 
 ### Community 7 - "UploadPage"
-Cohesion: 0.11
-Nodes (26): apiBase, ApiError, apiRequest(), getAccessToken(), jsonBody(), normalizeApiBase(), resolveApiBase(), currentUser (+18 more)
+Cohesion: 0.10
+Nodes (31): apiBase, ApiError, apiRequest(), getAccessToken(), jsonBody(), normalizeApiBase(), resolveApiBase(), currentUser (+23 more)
 
 ### Community 8 - "streamx_theme.dart"
 Cohesion: 0.07
 Nodes (27): brand, canvas, darkCanvas, darkDim, darkInk, darkLifted, darkLine, darkMuted (+19 more)
 
 ### Community 9 - "devDependencies"
-Cohesion: 0.09
-Nodes (22): devDependencies, concurrently@^9.1.2, jsdom@^29.1.1, @playwright/test@^1.64.1, tailwindcss@^3.4.17, tsx@^4.19.3, @types/cors@^2.8.17, @types/express@^5.0.3 (+14 more)
+Cohesion: 0.10
+Nodes (20): devDependencies, autoprefixer@^10.4.21, postcss@^8.5.3, tailwindcss@^3.4.17, @types/cors@^2.8.17, @types/express@^5.0.3, @types/node@^24.19.2, @types/react@^19.3.0 (+12 more)
 
 ### Community 10 - "streamx_video.dart"
 Cohesion: 0.07
@@ -217,8 +219,8 @@ Cohesion: 0.12
 Nodes (15): build, _buildCompact, _buildHorizontal, _buildVertical, compact, _details, horizontal, imageUrl (+7 more)
 
 ### Community 31 - "Button"
-Cohesion: 0.15
-Nodes (21): react-router-dom, vitest, Button, buttonStyles, EmptyState(), ErrorState(), VideoGridSkeleton(), ToastProvider() (+13 more)
+Cohesion: 0.33
+Nodes (12): Button, EmptyState(), ErrorState(), VideoGridSkeleton(), DiscoveryPage(), Mode, ContinueItem, HomePage() (+4 more)
 
 ### Community 32 - "StreamX"
 Cohesion: 0.29
@@ -242,7 +244,7 @@ Nodes (7): Size, height, width, Win32Window, child_content_, quit_on_close_, win
 
 ### Community 45 - "package.json"
 Cohesion: 0.13
-Nodes (14): allowScripts, esbuild@0.28.2, autoprefixer@^10.4.21, postcss@^8.5.3, @testing-library/user-event@^14.6.8, @types/node@^24.19.2, name, private (+6 more)
+Nodes (14): allowScripts, esbuild@0.28.2, firebase-admin@^14.5.0, concurrently@^9.1.2, jsdom@^29.1.1, tsx@^4.19.3, name, private (+6 more)
 
 ### Community 46 - "r2-cors.mjs"
 Cohesion: 0.18
@@ -256,49 +258,53 @@ Nodes (5): analyzer, exclude, include, linter, rules
 Cohesion: 0.50
 Nodes (3): Point, x, y
 
-### Community 55 - "App.tsx"
-Cohesion: 0.14
-Nodes (18): App(), DashboardPage, DiscoveryPage, HomePage, LibraryPage, NotFoundPage(), PageFallback(), SettingsPage (+10 more)
+### Community 55 - "lucide-react"
+Cohesion: 0.28
+Nodes (9): lucide-react, react-router-dom, palettes, VideoArtwork(), Creator, Video, VideoSearchOptions, VideoSearchResult (+1 more)
 
 ### Community 56 - "upload-page.tsx"
 Cohesion: 0.17
-Nodes (18): libraryLinks, NavItem(), primaryLinks, Sidebar(), SidebarProps, ButtonProps, IconButton(), Input (+10 more)
+Nodes (16): libraryLinks, NavItem(), primaryLinks, Sidebar(), SidebarProps, Badge(), ButtonProps, buttonStyles (+8 more)
 
-### Community 57 - "lucide-react"
+### Community 57 - "preview-videos.ts"
 Cohesion: 0.12
-Nodes (19): lucide-react, palettes, VideoArtwork(), ageMs(), design, documentary, images, nature (+11 more)
+Nodes (16): vitest, ToastContext, ToastContextValue, ToastKind, ToastItem, ageMs(), design, documentary (+8 more)
 
 ### Community 58 - "watch-page.tsx"
-Cohesion: 0.22
-Nodes (14): LoadingState(), saveForLater(), prettyTime(), ShellContext, WatchPage(), handlePlay(), toggleLike(), toggleWatchLater() (+6 more)
+Cohesion: 0.19
+Nodes (16): avatarInitials(), VideoCard(), saveForLater(), prettyTime(), ShellContext, WatchPage(), handlePlay(), toggleLike() (+8 more)
 
 ### Community 59 - "dashboard-page.tsx"
 Cohesion: 0.25
-Nodes (12): Badge(), DashboardPage(), changeVisibility(), remove(), ShellContext, StatCard(), statusLabel(), statusStyle() (+4 more)
+Nodes (13): LoadingState(), DashboardPage(), changeVisibility(), remove(), ShellContext, StatCard(), statusLabel(), statusStyle() (+5 more)
 
 ### Community 60 - "@testing-library/react"
-Cohesion: 0.40
-Nodes (4): @testing-library/jest-dom@^7.0.1, @testing-library/react@^16.3.3, @testing-library/jest-dom, @testing-library/react
+Cohesion: 0.25
+Nodes (6): @testing-library/jest-dom@^7.0.1, @testing-library/react@^16.3.3, @testing-library/user-event@^14.6.8, @testing-library/jest-dom, @testing-library/react, @testing-library/user-event
+
+### Community 61 - "videos.ts"
+Cohesion: 0.49
+Nodes (10): fetchCatalog(), fetchContinueWatching(), fetchLibraryVideos(), fetchOwnerVideos(), fetchPlaylistVideos(), fetchVideo(), FirestoreVideoDoc, getDocsWithFallback() (+2 more)
 
 ## Knowledge Gaps
 - **241 isolated node(s):** `category`, `copyWith`, `createdAt`, `creator`, `days` (+236 more)
-  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 514 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
-- **16 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 513 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
+- **17 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `react` connect `react` to `videos.ts`, `package.json`, `package.json`, `VideoPlayer`, `App.tsx`, `upload-page.tsx`, `lucide-react`, `watch-page.tsx`, `dashboard-page.tsx`, `Button`?**
+- **Why does `react` connect `react` to `videos.ts`, `package.json`, `UploadPage`, `package.json`, `VideoPlayer`, `lucide-react`, `upload-page.tsx`, `preview-videos.ts`, `watch-page.tsx`, `dashboard-page.tsx`, `Button`?**
   _High betweenness centrality (0.031) - this node is a cross-community bridge._
 - **What connects `category`, `copyWith`, `createdAt` to the rest of the system?**
   _241 weakly-connected nodes found - possible documentation gaps or missing edges._
-- **Should `videos.ts` be split into smaller, more focused modules?**
-  _Cohesion score 0.146218487394958 - nodes in this community are weakly interconnected._
-- **Why does `lucide-react` connect `lucide-react` to `videos.ts`, `package.json`, `react`, `package.json`, `VideoPlayer`, `App.tsx`, `upload-page.tsx`, `watch-page.tsx`, `dashboard-page.tsx`, `Button`?**
-  _High betweenness centrality (0.024) - this node is a cross-community bridge._
 - **Should `index.js` be split into smaller, more focused modules?**
   _Cohesion score 0.06765327695560254 - nodes in this community are weakly interconnected._
-- **Why does `Win32Window` connect `Win32Window` to `.Create`, `flutter_window.h`, `.OnCreate`, `Point`, `win32_window.cpp`, `FlutterWindow`?**
-  _High betweenness centrality (0.023) - this node is a cross-community bridge._
+- **Why does `lucide-react` connect `lucide-react` to `videos.ts`, `package.json`, `react`, `UploadPage`, `package.json`, `VideoPlayer`, `upload-page.tsx`, `preview-videos.ts`, `watch-page.tsx`, `dashboard-page.tsx`, `Button`?**
+  _High betweenness centrality (0.024) - this node is a cross-community bridge._
 - **Should `streamx_state.dart` be split into smaller, more focused modules?**
   _Cohesion score 0.03125 - nodes in this community are weakly interconnected._
+- **Why does `Win32Window` connect `Win32Window` to `.Create`, `flutter_window.h`, `.OnCreate`, `Point`, `win32_window.cpp`, `FlutterWindow`?**
+  _High betweenness centrality (0.023) - this node is a cross-community bridge._
+- **Should `index.ts` be split into smaller, more focused modules?**
+  _Cohesion score 0.06037414965986394 - nodes in this community are weakly interconnected._
